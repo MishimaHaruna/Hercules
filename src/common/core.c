@@ -236,28 +236,46 @@ const char* get_svn_revision(void) {
 	svn_version_buffer[0] = HERC_UNKNOWN_VER;
 	return svn_version_buffer;
 }
-/* whats our origin */
-#define GIT_ORIGIN "refs/remotes/origin/master"
 /* Grabs the hash from the last time the user updated his working copy (last pull)  */
 const char *get_git_hash (void) {
 	static char HerculesGitHash[41] = "";//Sha(40) + 1
 	FILE *fp;
+	char *filename = NULL;
 	
 	if( HerculesGitHash[0] != '\0' )
 		return HerculesGitHash;
 	
-	if ( (fp = fopen (".git/"GIT_ORIGIN, "r")) != NULL) {
-		char line[64];
-		char *rev = malloc (sizeof (char) * 50);
-		
-		if (fgets (line, sizeof (line), fp) && sscanf (line, "%50s", rev))
-			snprintf (HerculesGitHash, sizeof (HerculesGitHash), "%s", rev);
-		
-		free (rev);
-		fclose (fp);
-	} else {
-		HerculesGitHash[0] = HERC_UNKNOWN_VER;
+	filename = malloc(sizeof(char)*10);
+	strncpy(filename, ".git/HEAD", 10);
+	while( 1 ) {
+		if( (fp = fopen(filename, "r")) != NULL ) {
+			char line[128];
+			if( fgets(line, sizeof(line), fp) ) {
+				char *rev = NULL;
+				if( !strncmp(line, "ref: ", 5) ) {
+					// It contains a ref, let's look for it
+					free(filename);
+					filename = malloc(sizeof(char)*(strlen(line+5)+6));
+					strncpy(filename, ".git/", 6);
+					fclose(fp);
+					if( sscanf(line+5, "%127s", filename+5)) {
+						continue;
+					}
+					// Can't read the ref name
+					break;
+				}
+				// Not a ref, then it's probably a commit hash
+				rev = malloc(sizeof(char) * 51);
+				if( sscanf(line, "%50s", rev) ) {
+					snprintf(HerculesGitHash, sizeof(HerculesGitHash), "%s", rev);
+				}
+				free(rev);
+			}
+			fclose(fp);
+		}
+		break;
 	}
+	free(filename);
 	
 	if (! (*HerculesGitHash)) {
 		HerculesGitHash[0] = HERC_UNKNOWN_VER;
