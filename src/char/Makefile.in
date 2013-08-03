@@ -32,7 +32,7 @@ CC = @CC@
 export CC
 
 #####################################################################
-.PHONY : all char-server clean help
+.PHONY: all char-server clean help
 
 all: char-server
 
@@ -67,13 +67,17 @@ obj_sql/%.o: %.c $(CHAR_H) $(COMMON_H) $(COMMON_SQL_H) $(MT19937AR_H) $(LIBCONFI
 
 # missing object files
 ../common/obj_all/common.a:
+	@echo "	MAKE	common_sql"
 	@$(MAKE) -C ../common sql
 
 ../common/obj_sql/common_sql.a:
+	@echo "	MAKE	common_sql"
 	@$(MAKE) -C ../common sql
 
 $(MT19937AR_OBJ):
+	@echo "	MAKE	mt19937ar"
 	@$(MAKE) -C ../../3rdparty/mt19937ar
 
 $(LIBCONFIG_OBJ):
+	@echo "	MAKE	libconfig"
 	@$(MAKE) -C ../../3rdparty/libconfig

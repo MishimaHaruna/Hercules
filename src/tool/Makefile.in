@@ -23,7 +23,7 @@ CC = @CC@
 export CC
 
 #####################################################################
-.PHONY : all mapcache clean help
+.PHONY: all mapcache clean help
 
 all: mapcache
 
@@ -33,7 +33,7 @@ mapcache: obj_all $(MAPCACHE_OBJ) $(COMMON_OBJ) $(LIBCONFIG_OBJ)
 
 clean:
 	@echo "	CLEAN	tool"
-	@rm -rf obj_all/*.o ../../mapcache@EXEEXT@
+	@rm -rf *.o obj_all ../../mapcache@EXEEXT@
 
 help:
 	@echo "possible targets are 'mapcache' 'all' 'clean' 'help'"
@@ -54,10 +54,13 @@ obj_all/%.o: %.c $(COMMON_H) $(OTHER_H) $(LIBCONFIG_H)
 
 # missing common object files
 ../common/obj_all/%.o:
+	@echo "	MAKE	common_sql"
 	@$(MAKE) -C ../common sql
 
 ../common/obj_all/mini%.o:
+	@echo "	MAKE	common_sql"
 	@$(MAKE) -C ../common sql
 
 $(LIBCONFIG_OBJ):
+	@echo "	MAKE	libconfig"
 	@$(MAKE) -C ../../3rdparty/libconfig

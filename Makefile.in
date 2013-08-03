@@ -49,30 +49,39 @@ all: $(ALL_DEPENDS)
 sql: $(SQL_DEPENDS)
 
 common_sql: $(COMMON_SQL_DEPENDS)
+	@echo "	MAKE	$@"
 	@$(MAKE) -C src/common sql
 
 mt19937ar:
+	@echo "	MAKE	$@"
 	@$(MAKE) -C 3rdparty/mt19937ar
 
 libconfig:
+	@echo "	MAKE	$@"
 	@$(MAKE) -C 3rdparty/libconfig
 
 login_sql: $(LOGIN_SQL_DEPENDS)
+	@echo "	MAKE	$@"
 	@$(MAKE) -C src/login sql
 
 char_sql: $(CHAR_SQL_DEPENDS)
+	@echo "	MAKE	$@"
 	@$(MAKE) -C src/char
 
 map_sql: $(MAP_SQL_DEPENDS)
+	@echo "	MAKE	$@"
 	@$(MAKE) -C src/map sql
 
 tools: $(TOOLS_DEPENDS)
+	@echo "	MAKE	$@"
 	@$(MAKE) -C src/tool
 
 test:
+	@echo "	MAKE	$@"
 	@$(MAKE) -C src/test
 
 plugins: $(PLUGIN_DEPENDS)
+	@echo "	MAKE	$@"
 	@$(MAKE) -C src/plugins
 
 import:

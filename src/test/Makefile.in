@@ -22,7 +22,7 @@ CC = @CC@
 export CC
 
 #####################################################################
-.PHONY :all test_spinlock
+.PHONY: all test_spinlock
 
 all: test_spinlock
 
@@ -52,13 +52,17 @@ obj/%.o: %.c $(COMMON_H) $(MT19937AR_H) $(LIBCONFIG_H)
 
 # missing object files
 ../common/obj_all/common.a:
+	@echo "	MAKE	common_sql"
 	@$(MAKE) -C ../common sql
 	
 ../common/obj_sql/common_sql.a:
+	@echo "	MAKE	common_sql"
 	@$(MAKE) -C ../common sql
 
 $(MT19937AR_OBJ):
+	@echo "	MAKE	mt19937ar"
 	@$(MAKE) -C ../../3rdparty/mt19937ar
 
 $(LIBCONFIG_OBJ):
+	@echo "	MAKE	libconfig"
 	@$(MAKE) -C ../../3rdparty/libconfig

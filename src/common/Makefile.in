@@ -36,7 +36,7 @@ CC = @CC@
 export CC
 
 #####################################################################
-.PHONY : all sql clean help
+.PHONY: all sql clean help
 
 all: $(ALL_DEPENDS)
 
@@ -95,7 +95,9 @@ obj_sql/%.o: %.c $(COMMON_H) $(COMMON_SQL_H) $(LIBCONFIG_H)
 
 # missing object files
 $(MT19937AR_OBJ):
+	@echo "	MAKE	mt19937ar"
 	@$(MAKE) -C ../../3rdparty/mt19937ar
 
 $(LIBCONFIG_OBJ):
+	@echo "	MAKE	libconfig"
 	@$(MAKE) -C ../../3rdparty/libconfig
