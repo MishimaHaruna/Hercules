@@ -136,11 +136,6 @@ HPExport void plugin_init (void) {
 }
 /* run when server is ready (online) */
 HPExport void server_online (void) {
-	struct sample_data_struct *data;
-
-	CREATE(data,struct sample_data_struct,1);
-	
-	data->someNumber = rand()%777;
 	
 }
 /* run when server is shutting down */
