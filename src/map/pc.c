@@ -5955,11 +5955,14 @@ int pc_gainexp(struct map_session_data *sd, struct block_list *src, unsigned int
 		pc->checkjoblevelup(sd);
 		clif->updatestatus(sd,SP_JOBEXP);
 	}
-
+	
+#if PACKETVER >= 20091027
 	if(base_exp)
 		clif->displayexp(sd, base_exp, SP_BASEEXP, quest);
 	if(job_exp)
 		clif->displayexp(sd, job_exp,  SP_JOBEXP, quest);
+#endif
+	
 	if(sd->state.showexp) {
 		char output[256];
 		sprintf(output,
