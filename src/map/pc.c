@@ -4761,8 +4761,8 @@ int pc_steal_item(struct map_session_data *sd,struct block_list *bl, uint16 skil
 /*==========================================
  * Stole zeny from bl (mob)
  * return
- *	0 = fail
- *	1 = success
+ *      0 = fail
+ *    x>0 = success (stolen zeny)
  *------------------------------------------*/
 int pc_steal_coin(struct map_session_data *sd,struct block_list *target)
 {
@@ -4787,7 +4787,7 @@ int pc_steal_coin(struct map_session_data *sd,struct block_list *target)
 
 		pc->getzeny(sd, amount, LOG_TYPE_STEAL, NULL);
 		md->state.steal_coin_flag = 1;
-		return 1;
+		return amount;
 	}
 	return 0;
 }

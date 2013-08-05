@@ -6144,11 +6144,12 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 
 		case RG_STEALCOIN:
 			if(sd) {
-				if(pc->steal_coin(sd,bl))
+				int amount = pc->steal_coin(sd,bl);
+				if (amount)
 				{
 					dstmd->state.provoke_flag = src->id;
 					mob_target(dstmd, src, skill->get_range2(src,skill_id,skill_lv));
-					clif->skill_nodamage(src,bl,skill_id,skill_lv,1);
+					clif->skill_nodamage(src,bl,skill_id,amount,1);
 
 				}
 				else
