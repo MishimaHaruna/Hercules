@@ -107,29 +107,34 @@ void ShowDump(const void *buffer, size_t length)
 	}
 }
 
-#ifdef WIN32
-
 static char* checkpath(char *path, const char *srcpath)
 {
+#ifdef WIN32
+#define PATHSEP_FOREIGN '/'
+#else
+#define PATHSEP_FOREIGN '\\'
+#endif
 	// just make sure the char*path is not const
 	char *p = path;
 
 	if (NULL == path || NULL == srcpath)
 		return path;
-	while(*srcpath) {
-		if (*srcpath=='/') {
-			*p++ = '\\';
+	while (*srcpath) {
+		if (*srcpath == PATHSEP_FOREIGN) {
+			*p++ = PATHSEP;
 			srcpath++;
-		}
-		else
+		} else {
 			*p++ = *srcpath++;
+		}
 	}
 	*p = *srcpath; //EOS
 	return path;
+#undef PATHSEP_FOREIGN
 }
 
 void findfile(const char *p, const char *pat, void (func)(const char*))
 {
+#ifdef WIN32
 	WIN32_FIND_DATAA FindFileData;
 	HANDLE hFind;
 	char tmppath[MAX_PATH+1];
@@ -166,32 +171,8 @@ void findfile(const char *p, const char *pat, void (func)(const char*))
 		FindClose(hFind);
 	}
 	return;
-}
-#else
-
+#else // not WIN32
 #define MAX_DIR_PATH 2048
-
-static char* checkpath(char *path, const char*srcpath)
-{
-	// just make sure the char*path is not const
-	char *p=path;
-
-	if(NULL!=path && NULL!=srcpath) {
-		while(*srcpath) {
-			if (*srcpath=='\\') {
-				*p++ = '/';
-				srcpath++;
-			}
-			else
-				*p++ = *srcpath++;
-		}
-		*p = *srcpath; //EOS
-	}
-	return path;
-}
-
-void findfile(const char *p, const char *pat, void (func)(const char*))
-{
 	DIR* dir;             ///< pointer to the scanned directory.
 	struct dirent* entry; ///< pointer to one directory entry.
 	struct stat dir_stat; ///< used by stat().
@@ -235,8 +216,8 @@ void findfile(const char *p, const char *pat, void (func)(const char*))
 	}//end while
 
 	closedir(dir);
+#endif // WIN32
 }
-#endif
 
 bool exists(const char* filename)
 {
@@ -452,7 +433,7 @@ bool HCache_check(const char *file)
 	else if (file[0] == '.')
 		file++;
 
-	snprintf(s_path, 255, "./cache/%s", file);
+	safesnprintf(s_path, 255, "./cache/%s", file);
 
 	if (!(second = fopen(s_path,"rb"))) {
 		fclose(first);
@@ -500,7 +481,7 @@ FILE *HCache_open(const char *file, const char *opt)
 	else if( file[0] == '.' )
 		file++;
 
-	snprintf(s_path, 255, "./cache/%s", file);
+	safesnprintf(s_path, 255, "./cache/%s", file);
 
 	if( !(first = fopen(s_path,opt)) ) {
 		return NULL;

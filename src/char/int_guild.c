@@ -912,7 +912,7 @@ int mapif_guild_created(int fd, int account_id, struct guild *g)
 // Guild not found
 int mapif_guild_noinfo(int fd, int guild_id)
 {
-	unsigned char buf[12];
+	unsigned char buf[8];
 	WBUFW(buf,0)=0x3831;
 	WBUFW(buf,2)=8;
 	WBUFL(buf,4)=guild_id;
@@ -927,7 +927,7 @@ int mapif_guild_noinfo(int fd, int guild_id)
 // Send guild info
 int mapif_guild_info(int fd, struct guild *g)
 {
-	unsigned char buf[8+sizeof(struct guild)];
+	unsigned char buf[4+sizeof(struct guild)];
 	nullpo_ret(g);
 	WBUFW(buf,0)=0x3831;
 	WBUFW(buf,2)=4+sizeof(struct guild);
@@ -1099,7 +1099,7 @@ int mapif_guild_position(struct guild *g, int idx)
 // Send the guild notice
 int mapif_guild_notice(struct guild *g)
 {
-	unsigned char buf[256];
+	unsigned char buf[186];
 	nullpo_ret(g);
 	WBUFW(buf,0)=0x383e;
 	WBUFL(buf,2)=g->guild_id;

@@ -1056,7 +1056,7 @@ void Sql_HerculesUpdateSkip(struct Sql *self, const char *filename)
 		return;
 	}
 
-	snprintf(path,41,"sql-files/upgrades/%s",filename);
+	safesnprintf(path,41,"sql-files/upgrades/%s",filename);
 
 	if( !( ifp = fopen(path, "r") ) ) {
 		ShowError("Upgrade file '%s' was not found!\n",filename);

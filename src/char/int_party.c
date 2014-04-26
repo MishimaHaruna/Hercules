@@ -403,7 +403,7 @@ int mapif_party_memberadded(int fd, int party_id, int account_id, int char_id, i
 // Party setting change notification
 int mapif_party_optionchanged(int fd, struct party *p, int account_id, int flag)
 {
-	unsigned char buf[16];
+	unsigned char buf[15];
 	nullpo_ret(p);
 	WBUFW(buf,0)=0x3823;
 	WBUFL(buf,2)=p->party_id;
@@ -420,7 +420,7 @@ int mapif_party_optionchanged(int fd, struct party *p, int account_id, int flag)
 
 //Withdrawal notification party
 int mapif_party_withdraw(int party_id,int account_id, int char_id) {
-	unsigned char buf[16];
+	unsigned char buf[14];
 
 	WBUFW(buf,0) = 0x3824;
 	WBUFL(buf,2) = party_id;
@@ -433,7 +433,7 @@ int mapif_party_withdraw(int party_id,int account_id, int char_id) {
 //Party map update notification
 int mapif_party_membermoved(struct party *p, int idx)
 {
-	unsigned char buf[20];
+	unsigned char buf[19];
 
 	nullpo_ret(p);
 	Assert_ret(idx >= 0 && idx < MAX_PARTY);
@@ -451,7 +451,7 @@ int mapif_party_membermoved(struct party *p, int idx)
 //Dissolution party notification
 int mapif_party_broken(int party_id, int flag)
 {
-	unsigned char buf[16];
+	unsigned char buf[7];
 	WBUFW(buf,0)=0x3826;
 	WBUFL(buf,2)=party_id;
 	WBUFB(buf,6)=flag;
@@ -465,6 +465,8 @@ int mapif_party_message(int party_id, int account_id, const char *mes, int len, 
 {
 	unsigned char buf[512];
 	nullpo_ret(mes);
+	if (len > 500)
+		len = 500;
 	WBUFW(buf,0)=0x3827;
 	WBUFW(buf,2)=len+12;
 	WBUFL(buf,4)=party_id;

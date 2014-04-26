@@ -150,7 +150,7 @@ unsigned int inter_auction_create(struct auction_data *auction)
 
 void mapif_auction_message(int char_id, unsigned char result)
 {
-	unsigned char buf[74];
+	unsigned char buf[7];
 
 	WBUFW(buf,0) = 0x3854;
 	WBUFL(buf,2) = char_id;

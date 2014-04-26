@@ -926,7 +926,7 @@ bool sv_readdb(const char* directory, const char* filename, char delim, int minc
 	int columns, fields_length;
 	char path[1024], line[1024];
 
-	snprintf(path, sizeof(path), "%s/%s", directory, filename);
+	safesnprintf(path, sizeof(path), "%s/%s", directory, filename);
 
 	// open file
 	if( (fp = fopen(path, "r")) == NULL ) {

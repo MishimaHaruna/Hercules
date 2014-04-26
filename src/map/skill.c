@@ -2631,6 +2631,7 @@ int skill_blown(struct block_list* src, struct block_list* target, int count, in
 	struct status_change *tsc = status->get_sc(target);
 
 	nullpo_ret(src);
+	nullpo_ret(target);
 
 	if (src != target && map->list[src->m].flag.noknockback)
 		return 0; // No knocking
@@ -17323,7 +17324,8 @@ int skill_delunitgroup(struct skill_unit_group *group, const char *file, int lin
 	}
 
 	idb_remove(skill->group_db, group->group_id);
-	map->freeblock(&group->unit.data[0].bl); // schedules deallocation of whole array (HACK)
+	if (group->unit.data != NULL)
+		map->freeblock(&group->unit.data[0].bl); // schedules deallocation of whole array (HACK)
 	group->unit.data=NULL;
 	group->group_id=0;
 	group->unit.count=0;

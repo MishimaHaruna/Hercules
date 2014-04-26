@@ -1703,7 +1703,7 @@ int char_make_new_char_sql(struct char_session_data *sd, const char *name_, int 
 /*----------------------------------------------------------------------------------------------------------*/
 int char_divorce_char_sql(int partner_id1, int partner_id2)
 {
-	unsigned char buf[64];
+	unsigned char buf[10];
 
 	if( SQL_ERROR == SQL->Query(inter->sql_handle, "UPDATE `%s` SET `partner_id`='0' WHERE `char_id`='%d' OR `char_id`='%d' LIMIT 2", char_db, partner_id1, partner_id2) )
 		Sql_ShowDebug(inter->sql_handle);
@@ -1773,7 +1773,7 @@ int char_delete_char_sql(int char_id)
 	/* De-addopt [Zephyrus] */
 	if( father_id || mother_id )
 	{ // Char is Baby
-		unsigned char buf[64];
+		unsigned char buf[14];
 
 		if( SQL_ERROR == SQL->Query(inter->sql_handle, "UPDATE `%s` SET `child`='0' WHERE `char_id`='%d' OR `char_id`='%d'", char_db, father_id, mother_id) )
 			Sql_ShowDebug(inter->sql_handle);
@@ -2841,7 +2841,7 @@ void char_read_fame_list(void) {
 // Send map-servers the fame ranking lists
 int char_send_fame_list(int fd) {
 	int i, len = 8;
-	unsigned char buf[32000];
+	unsigned char *buf = aMalloc(8 + sizeof(struct fame_list) * (fame_list_size_smith + fame_list_size_chemist + fame_list_size_taekwon));
 
 	WBUFW(buf,0) = 0x2b1b;
 
@@ -2870,6 +2870,8 @@ int char_send_fame_list(int fd) {
 		mapif->send(fd, buf, len);
 	else
 		mapif->sendall(buf, len);
+
+	aFree(buf);
 
 	return 0;
 }
@@ -2927,7 +2929,7 @@ void mapif_server_destroy(int id)
 void mapif_server_reset(int id)
 {
 	int i,j;
-	unsigned char buf[16384];
+	unsigned char *buf = aMalloc(10 + 4 * VECTOR_LENGTH(chr->server[id].maps));
 	int fd = chr->server[id].fd;
 	//Notify other map servers that this one is gone. [Skotlex]
 	WBUFW(buf,0) = 0x2b20;
@@ -2943,6 +2945,7 @@ void mapif_server_reset(int id)
 		WBUFW(buf,2) = j * 4 + 10;
 		mapif->sendallwos(fd, buf, WBUFW(buf,2));
 	}
+	aFree(buf);
 	if( SQL_ERROR == SQL->Query(inter->sql_handle, "DELETE FROM `%s` WHERE `index`='%d'", ragsrvinfo_db, chr->server[id].fd) )
 		Sql_ShowDebug(inter->sql_handle);
 	chr->online_char_db->foreach(chr->online_char_db,chr->db_setoffline,id); //Tag relevant chars as 'in disconnected' server.

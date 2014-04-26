@@ -803,6 +803,7 @@ const char *HPM_file2ptr(const char *file)
 
 	/* we handle this memory outside of the server's memory manager because we need it to exist after the memory manager goes down */
 	HPM->filenames.data = realloc(HPM->filenames.data, (++HPM->filenames.count)*sizeof(struct HPMFileNameCache));
+	Assert(HPM->filenames.data != NULL);
 
 	HPM->filenames.data[i].addr = file;
 	HPM->filenames.data[i].name = strdup(file);

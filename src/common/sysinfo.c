@@ -286,7 +286,7 @@ bool sysinfo_svn_get_revision(char **out)
 			if (*out != NULL)
 				aFree(*out);
 			*out = aCalloc(1, 8);
-			snprintf(*out, 8, "%d", atoi(buffer + j));
+			safesnprintf(*out, 8, "%d", atoi(buffer + j));
 			break;
 		}
 		aFree(buffer);
@@ -321,7 +321,7 @@ bool sysinfo_git_get_revision(char **out)
 
 	while (*ref) {
 		FILE *fp;
-		snprintf(filepath, sizeof(filepath), ".git/%s", ref);
+		safesnprintf(filepath, sizeof(filepath), ".git/%s", ref);
 		if ((fp = fopen(filepath, "r")) != NULL) {
 			if (fgets(line, sizeof(line)-1, fp) == NULL) {
 				fclose(fp);
@@ -402,6 +402,7 @@ void sysinfo_osversion_retrieve(void)
 		if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion <= 3) { // Between Vista and 8.1
 			PGPI pGPI;
 			DWORD dwType;
+			HMODULE hModule;
 			if (osvi.dwMinorVersion == 0) {
 				StrBuf->AppendStr(&buf, osvi.wProductType == VER_NT_WORKSTATION ? "Windows Vista" : "Windows Server 2008");
 			} else if (osvi.dwMinorVersion == 1) {
@@ -429,7 +430,8 @@ void sysinfo_osversion_retrieve(void)
 				}
 			}
 
-			pGPI = (PGPI) GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "GetProductInfo");
+			Assert(NULL != (hModule = GetModuleHandle(TEXT("kernel32.dll"))));
+			pGPI = (PGPI) GetProcAddress(hModule, "GetProductInfo");
 
 			pGPI(osvi.dwMajorVersion, osvi.dwMinorVersion, 0, 0, &dwType);
 
@@ -616,8 +618,8 @@ void sysinfo_systeminfo_retrieve(LPSYSTEM_INFO info)
 	PGNSI pGNSI;
 
 	// Call GetNativeSystemInfo if supported or GetSystemInfo otherwise.
-	pGNSI = (PGNSI) GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "GetNativeSystemInfo");
-	if (NULL != pGNSI)
+	if (NULL != (hModule = GetModuleHandle(TEXT("kernel32.dll")))
+	 && NULL != (pGNSI = (PGNSI) GetProcAddress(hModule, "GetNativeSystemInfo")))
 		pGNSI(info);
 	else
 		GetSystemInfo(info);
@@ -648,6 +650,7 @@ void sysinfo_cpu_retrieve(void)
 {
 	StringBuf buf;
 	SYSTEM_INFO si;
+	HMODULE hModule;
 	ZeroMemory(&si, sizeof(SYSTEM_INFO));
 	StrBuf->Init(&buf);
 
@@ -684,6 +687,7 @@ void sysinfo_cpu_retrieve(void)
 void sysinfo_arch_retrieve(void)
 {
 	SYSTEM_INFO si;
+	HMODULE hModule;
 	ZeroMemory(&si, sizeof(SYSTEM_INFO));
 
 	if (sysinfo->p->arch != NULL) {

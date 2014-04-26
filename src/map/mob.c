@@ -3349,7 +3349,7 @@ int mobskill_use(struct mob_data *md, int64 tick, int event) {
 			struct mob_chat *mc = mob->chat(ms[i].msg_id);
 			char temp[CHAT_SIZE_MAX];
 			char name[NAME_LENGTH];
-			snprintf(name, sizeof name,"%s", md->name);
+			safesnprintf(name, sizeof name,"%s", md->name);
 			strtok(name, "#"); // discard extra name identifier if present [Daegaladh]
 			safesnprintf(temp, sizeof temp,"%s : %s", name, mc->msg);
 			clif->messagecolor(&md->bl, mc->color, temp);

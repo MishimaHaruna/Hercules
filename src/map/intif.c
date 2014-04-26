@@ -220,7 +220,7 @@ int intif_main_message(struct map_session_data* sd, const char* message)
 	nullpo_ret(message);
 
 	// format the message for main broadcasting
-	snprintf( output, sizeof(output), msg_txt(386), sd->status.name, message );
+	safesnprintf( output, sizeof(output), msg_txt(386), sd->status.name, message );
 
 	// send the message using the inter-server broadcast service
 	intif->broadcast2(output, (int)strlen(output) + 1, 0xFE000000, 0, 0, 0, 0);

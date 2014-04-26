@@ -807,6 +807,7 @@ void clif_clearflooritem(struct flooritem_data *fitem, int fd)
 	unsigned char buf[16];
 
 	nullpo_retv(fitem);
+	Assert_retv(16 >= packet_len(0xa1));
 
 	WBUFW(buf,0) = 0xa1;
 	WBUFL(buf,2) = fitem->bl.id;
@@ -850,6 +851,7 @@ void clif_clearunit_area(struct block_list* bl, clr_type type)
 	unsigned char buf[8];
 
 	nullpo_retv(bl);
+	Assert_retv(8 >= packet_len(0x80));
 
 	WBUFW(buf,0) = 0x80;
 	WBUFL(buf,2) = bl->id;
@@ -1376,6 +1378,7 @@ void clif_class_change(struct block_list *bl, int class_, int type, struct map_s
 	if(!pc->db_checkid(class_))
 	{// player classes yield missing sprites
 		unsigned char buf[16];
+		Assert_retv(16 <= packet_len(0x1b0));
 		WBUFW(buf,0)=0x1b0;
 		WBUFL(buf,2)=bl->id;
 		WBUFB(buf,6)=type;
@@ -1840,6 +1843,7 @@ void clif_move(struct unit_data *ud)
 		clif->ally_only = true;
 #endif
 
+	Assert_retv(16 <= packet_len(0x86));
 	WBUFW(buf,0)=0x86;
 	WBUFL(buf,2)=bl->id;
 	WBUFPOS2(buf,6,bl->x,bl->y,ud->to_x,ud->to_y,8,8);
@@ -1933,6 +1937,7 @@ void clif_fixpos(struct block_list *bl) {
 	unsigned char buf[10];
 
 	nullpo_retv(bl);
+	Assert_retv(10 >= packet_len(0x88));
 
 	WBUFW(buf,0) = 0x88;
 	WBUFL(buf,2) = bl->id;
@@ -2837,6 +2842,7 @@ void clif_guild_xy(struct map_session_data *sd)
 	unsigned char buf[10];
 
 	nullpo_retv(sd);
+	Assert_retv(10 >= packet_len(0x1eb));
 
 	WBUFW(buf,0)=0x1eb;
 	WBUFL(buf,2)=sd->status.account_id;
@@ -2868,6 +2874,7 @@ void clif_guild_xy_remove(struct map_session_data *sd)
 	unsigned char buf[10];
 
 	nullpo_retv(sd);
+	Assert_retv(10 >= packet_len(0x1eb));
 
 	WBUFW(buf,0)=0x1eb;
 	WBUFL(buf,2)=sd->status.account_id;
@@ -3196,6 +3203,7 @@ void clif_changestatus(struct map_session_data* sd,int type,int val)
 	unsigned char buf[12];
 
 	nullpo_retv(sd);
+	Assert_retv(12 >= packet_len(0x1ab));
 
 	WBUFW(buf,0)=0x1ab;
 	WBUFL(buf,2)=sd->bl.id;
@@ -4092,12 +4100,14 @@ void clif_tradeadditem(struct map_session_data* sd, struct map_session_data* tsd
 		else
 			WBUFW(buf,6) = sd->status.inventory[index].nameid; // type id
 #else
-		if(sd->inventory_data[index] && sd->inventory_data[index]->view_id > 0)
-			WBUFW(buf,2) = sd->inventory_data[index]->view_id;
-		else
-			WBUFW(buf,2) = sd->status.inventory[index].nameid;       // type id
-		WBUFB(buf,4) = sd->inventory_data[index]->type;          // item type
-		WBUFL(buf,5) = amount; // amount
+		if (sd->inventory_data[index] && sd->inventory_data[index]->view_id > 0) {
+			WBUFW(buf, 2) = sd->inventory_data[index]->view_id; // type id
+			WBUFB(buf, 4) = sd->inventory_data[index]->type;    // item type
+		} else {
+			WBUFW(buf, 2) = sd->status.inventory[index].nameid; // type id
+			WBUFB(buf, 4) = IT_ETC;                             // item type
+		}
+		WBUFL(buf, 5) = amount; // amount
 		buf = WBUFP(buf,1); //Advance 1B
 #endif
 		WBUFB(buf,8) = sd->status.inventory[index].identify; //identify flag
@@ -11060,7 +11070,7 @@ void clif_noask_sub(struct map_session_data *src, struct map_session_data *targe
 	msg = msg_sd(src,392);
 	clif_disp_onlyself(src, msg);
 	//Notice that a request was rejected.
-	snprintf(output, 256, msg_sd(target,393+type), src->status.name, 256);
+	safesnprintf(output, 256, msg_sd(target,393+type), src->status.name, 256);
 	clif_disp_onlyself(target, output);
 }
 
@@ -13970,7 +13980,7 @@ void clif_parse_PMIgnore(int fd, struct map_session_data* sd)
 		if( i != MAX_IGNORE_LIST - 1 )
 			memmove(&sd->ignore[i], &sd->ignore[i+1], (MAX_IGNORE_LIST-i-1)*sizeof(sd->ignore[0]));
 		// wipe last entry
-		memset(sd->ignore[MAX_IGNORE_LIST-1].name, 0, sizeof(sd->ignore[0].name));
+		memset(&sd->ignore[MAX_IGNORE_LIST-1], 0, sizeof(sd->ignore[0]));
 	}
 
 	clif->wisexin(sd, type, 0); // success
@@ -14613,7 +14623,7 @@ void clif_ranking_pk(struct map_session_data* sd) {
 	WFIFOHEAD(fd,packet_len(0x238));
 	WFIFOW(fd,0) = 0x238;
 	for (i = 0; i < 10;i ++) {
-		strncpy(WFIFOP(fd, i * 24 + 2), "Unknown", NAME_LENGTH);
+		safestrncpy(WFIFOP(fd, i * 24 + 2), "Unknown", NAME_LENGTH);
 		WFIFOL(fd,i*4+242) = 0;
 	}
 	WFIFOSET(fd, packet_len(0x238));
@@ -18489,7 +18499,7 @@ void clif_show_modifiers (struct map_session_data *sd) {
 	if( sd->status.mod_exp != 100 || sd->status.mod_drop != 100 || sd->status.mod_death != 100 ) {
 		char output[128];
 
-		snprintf(output,128,"Base EXP : %d%% | Base Drop: %d%% | Base Death Penalty: %d%%",
+		safesnprintf(output,128,"Base EXP : %d%% | Base Drop: %d%% | Base Death Penalty: %d%%",
 				sd->status.mod_exp,sd->status.mod_drop,sd->status.mod_death);
 		clif->broadcast2(&sd->bl, output, (int)strlen(output) + 1, 0xffbc90, 0x190, 12, 0, 0, SELF);
 	}
