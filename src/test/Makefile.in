@@ -40,12 +40,13 @@ MT19937AR_D = $(THIRDPARTY_D)/mt19937ar
 MT19937AR_OBJ = $(MT19937AR_D)/mt19937ar.o
 MT19937AR_H = $(MT19937AR_D)/mt19937ar.h
 
-TEST_C = test_libconfig.c test_spinlock.c
-TEST_OBJ = $(addprefix obj/, $(patsubst %c,%o,%(TEST_C)))
-TEST_H =
-TEST_DEPENDS = $(COMMON_D)/obj_sql/common_sql.a $(COMMON_D)/obj_all/common.a $(MT19937AR_OBJ) $(LIBCONFIG_OBJ) $(SYSINFO_INC)
+# Legacy tests
+OLDTEST_C = oldtest_libconfig.c oldtest_spinlock.c
+OLDTEST_OBJ = $(addprefix obj/, $(patsubst %c,%o,%(OLDTEST_C)))
+OLDTEST_H =
+OLDTEST_DEPENDS = $(COMMON_D)/obj_sql/common_sql.a $(COMMON_D)/obj_all/common.a $(MT19937AR_OBJ) $(LIBCONFIG_OBJ) $(SYSINFO_INC)
 
-TESTS_ALL = test_libconfig test_spinlock
+OLDTESTS_ALL = oldtest_libconfig oldtest_spinlock
 
 @SET_MAKE@
 
@@ -53,9 +54,9 @@ CC = @CC@
 export CC
 
 #####################################################################
-.PHONY: all $(TESTS_ALL) clean buildclean
+.PHONY: all $(OLDTESTS_ALL) clean buildclean
 
-all: $(TESTS_ALL) Makefile
+all: $(OLDTESTS_ALL) Makefile
 
 buildclean:
 	@echo "	CLEAN	test (build temp files)"
@@ -63,14 +64,14 @@ buildclean:
 
 clean: buildclean
 	@echo "	CLEAN	test"
-	@rm -rf ../../test_*@EXEEXT@
+	@rm -rf ../../oldtest_*@EXEEXT@
 
 #####################################################################
 
 Makefile: Makefile.in
 	@$(MAKE) -C ../.. src/test/Makefile
 
-$(SYSINFO_INC): $(TEST_C) $(TEST_H) $(COMMON_H) $(CONFIG_H) $(MT19937AR_H) $(LIBCONFIG_H)
+$(SYSINFO_INC): $(OLDTEST_C) $(OLDTEST_H) $(COMMON_H) $(CONFIG_H) $(MT19937AR_H) $(LIBCONFIG_H)
 	@echo "	MAKE	$@"
 	@$(MAKE) -C ../.. sysinfo
 
@@ -82,17 +83,17 @@ obj:
 
 # executables
 
-$(TESTS_ALL): test_%: ../../test_%@EXEEXT@
+$(OLDTESTS_ALL): oldtest_%: ../../oldtest_%@EXEEXT@
 	@echo "	TEST	$@"
 
-../../test_%@EXEEXT@: obj/test_%.o $(TEST_DEPENDS) Makefile
+../../oldtest_%@EXEEXT@: obj/oldtest_%.o $(OLDTEST_DEPENDS) Makefile
 	@echo "	LD	$(notdir $@)"
 	@$(CC) @STATIC@ @LDFLAGS@ -o $@ $< $(COMMON_D)/obj_all/common.a $(COMMON_D)/obj_sql/common_sql.a \
 		$(MT19937AR_OBJ) $(LIBCONFIG_OBJ) @LIBS@ @MYSQL_LIBS@
 
 # object files
 
-obj/%.o: %.c $(TEST_H) $(COMMON_H) $(CONFIG_H) $(MT19937AR_H) $(LIBCONFIG_H) | obj
+obj/oldtest_%.o: oldtest_%.c $(OLDTEST_H) $(COMMON_H) $(CONFIG_H) $(MT19937AR_H) $(LIBCONFIG_H) | obj
 	@echo "	CC	$<"
 	@$(CC) @CFLAGS@ @DEFS@ $(COMMON_INCLUDE) $(THIRDPARTY_INCLUDE) @MYSQL_CFLAGS@ @CPPFLAGS@ -c $(OUTPUT_OPTION) $<
 
