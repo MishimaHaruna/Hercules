@@ -30,6 +30,7 @@ ifeq ($(HAVE_MYSQL),yes)
 	CHAR_SQL_DEPENDS=mt19937ar libconfig common_sql sysinfo
 	MAP_SQL_DEPENDS=mt19937ar libconfig common_sql sysinfo
 	TOOLS_DEPENDS=mt19937ar libconfig common_sql sysinfo
+	TESTS_DEPENDS=
 else
 	ALL_DEPENDS=needs_mysql
 	SQL_DEPENDS=needs_mysql
@@ -38,6 +39,7 @@ else
 	CHAR_SQL_DEPENDS=needs_mysql
 	MAP_SQL_DEPENDS=needs_mysql
 	TOOLS_DEPENDS=needs_mysql
+	TESTS_DEPENDS=no_cmocka
 endif
 
 WITH_PLUGINS=@WITH_PLUGINS@
@@ -68,7 +70,8 @@ export CC
 	tools \
 	plugins \
 	import \
-	test \
+	tests \
+	oldtest \
 	clean \
 	buildclean \
 	distclean \
@@ -124,9 +127,17 @@ tools: $(TOOLS_DEPENDS) src/tool/Makefile
 	@echo "	MAKE	$@"
 	@$(MAKE) -C src/tool
 
-test: src/test/Makefile
+oldtest: $(TESTS_DEPENDS) src/test/Makefile
+	@echo "	MAKE	$@"
+	@$(MAKE) -C src/test oldtest
+
+tests: $(TESTS_DEPENDS) src/test/Makefile
 	@echo "	MAKE	$@"
 	@$(MAKE) -C src/test
+
+runtests: tests
+	@echo "	TESTING"
+	@$(MAKE) -C src/test run
 
 plugins: $(PLUGIN_DEPENDS) src/plugins/Makefile
 	@echo "	MAKE	$@"
@@ -195,7 +206,11 @@ help: Makefile
 	@echo "                'map_sql' and 'import')"
 	@echo "'plugins'     - builds all available plugins"
 	@echo "'plugin.Name' - builds plugin named 'Name'"
-	@echo "'test'        - builds tests"
+	@echo "'test'        - builds old tests"
+ifeq ($(HAVE_CMOCKA),yes)
+	@echo "'tests'       - builds tests"
+	@echo "'runtests'    - runs tests"
+endif
 	@echo "'clean'       - cleans executables and objects"
 	@echo "'buildclean'  - cleans build temporary (object) files, without deleting the"
 	@echo "                executables"
@@ -218,3 +233,6 @@ needs_mysql:
 no_plugins:
 	@echo "Plugins disabled by the configure script"
 	@exit 1
+
+no_cmocka:
+	@echo "CMocka disabled by the configure script. Only old tests will be compiled."

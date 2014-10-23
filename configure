@@ -627,6 +627,9 @@ HAVE_PERL
 HAVE_DOXYGEN
 PLUGINSTATIC
 STATIC
+CMOCKA_CFLAGS
+CMOCKA_LIBS
+HAVE_CMOCKA
 MYSQL_LIBS
 MYSQL_CFLAGS
 MYSQL_VERSION
@@ -710,6 +713,7 @@ with_maxconn
 with_mysql
 with_MYSQL_CFLAGS
 with_MYSQL_LIBS
+with_cmocka
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1391,6 +1395,10 @@ Optional Packages:
                           "mysql_config --include")
   --with-MYSQL_LIBS=ARG   specify MYSQL_LIBS manually (instead of using
                           "mysql_config --libs")
+  --with-cmocka[=ARG]     use CMocka library, optionally specify the full path
+                          of pcre installation directory (by default CMocka is
+                          used if found. It is only necessary to enable unit
+                          tests)
 
 Some influential environment variables:
   CC          C compiler command
@@ -3924,6 +3932,33 @@ if test "${with_MYSQL_LIBS+set}" = set; then :
 
 else
   manual_MYSQL_LIBS="no"
+
+fi
+
+
+
+#
+# Enable/disable CMocka and optionally specify the path (optional library)
+#
+
+# Check whether --with-cmocka was given.
+if test "${with_cmocka+set}" = set; then :
+  withval=$with_cmocka;
+		if test "$withval" = "no" ; then
+			want_cmocka="no"
+		else
+			want_cmocka="yes"
+			require_cmocka="yes"
+			if test "$withval" != "yes" ; then
+				if test ! -d "$withval" ; then
+					as_fn_error $? "$withval is not a directoy" "$LINENO" 5
+				fi
+				CMOCKA_HOME="$withval"
+			fi
+		fi
+
+else
+  want_cmocka="yes" require_cmocka="no"
 
 fi
 
@@ -9276,6 +9311,132 @@ if test "$ac_res" != no; then :
 else
   as_fn_error $? "PCRE not found or incompatible" "$LINENO" 5
 fi
+
+
+
+#
+# CMocka library (optional)
+#
+CMOCKA_LIBS=""
+CMOCKA_CFLAGS=""
+
+if test "$want_cmocka" = "no" ; then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: ignoring CMocka (optional)" >&5
+$as_echo "$as_me: ignoring CMocka (optional)" >&6;}
+else
+	if test -z "$CMOCKA_HOME" ; then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for _run_tests in -lcmocka" >&5
+$as_echo_n "checking for _run_tests in -lcmocka... " >&6; }
+if ${ac_cv_lib_cmocka__run_tests+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lcmocka  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char _run_tests ();
+int
+main ()
+{
+return _run_tests ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_cmocka__run_tests=yes
+else
+  ac_cv_lib_cmocka__run_tests=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_cmocka__run_tests" >&5
+$as_echo "$ac_cv_lib_cmocka__run_tests" >&6; }
+if test "x$ac_cv_lib_cmocka__run_tests" = xyes; then :
+  HAVE_CMOCKA="yes"
+fi
+
+		if test "$HAVE_CMOCKA" = "yes" ; then
+			CMOCKA_LIBS="-lcmocka"
+		fi
+	else
+		CMOCKA_OLD_LDFLAGS="$LDFLAGS" ; LDFLAGS="$LDFLAGS -L$CMOCKA_HOME/lib"
+		CMOCKA_OLD_CPPFLAGS="$CPPFLAGS" ; CPPFLAGS="$CPPFLAGS -I$CMOCKA_HOME/include"
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for _run_tests in -lcmocka" >&5
+$as_echo_n "checking for _run_tests in -lcmocka... " >&6; }
+if ${ac_cv_lib_cmocka__run_tests+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lcmocka  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char _run_tests ();
+int
+main ()
+{
+return _run_tests ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_cmocka__run_tests=yes
+else
+  ac_cv_lib_cmocka__run_tests=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_cmocka__run_tests" >&5
+$as_echo "$ac_cv_lib_cmocka__run_tests" >&6; }
+if test "x$ac_cv_lib_cmocka__run_tests" = xyes; then :
+  HAVE_CMOCKA="yes"
+fi
+
+		CPPFLAGS="$CMOCKA_OLD_CPPFLAGS"
+		LDFLAGS="$CMOCKA_OLD_LDFLAGS"
+		if test "$HAVE_CMOCKA" = "yes" ; then
+			CMOCKA_LIBS="-L$CMOCKA_HOME/lib -lcmocka"
+			test -d "$CMOCKA_HOME/include" && CMOCKA_CFLAGS="-I$CMOCKA_HOME/include"
+		fi
+	fi
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking CMocka library (optional)" >&5
+$as_echo_n "checking CMocka library (optional)... " >&6; }
+	if test "$HAVE_CMOCKA" = "yes" ; then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+	else
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		if test "$require_cmocka" = "yes" ; then
+			as_fn_error $? "CMocka not found or incompatible (requested)" "$LINENO" 5
+		else
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: disabling CMocka (optional)" >&5
+$as_echo "$as_me: disabling CMocka (optional)" >&6;}
+		fi
+	fi
+fi
+
+
+
 
 
 #

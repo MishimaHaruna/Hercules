@@ -48,15 +48,31 @@ OLDTEST_DEPENDS = $(COMMON_D)/obj_sql/common_sql.a $(COMMON_D)/obj_all/common.a 
 
 OLDTESTS_ALL = oldtest_libconfig oldtest_spinlock
 
+ifeq (@HAVE_CMOCKA@,yes)
+	TEST_NAMES =
+	TEST_H =
+	TEST_DEPENDS = $(MT19937AR_OBJ) $(LIBCONFIG_OBJ)
+else
+	TEST_NAMES =
+	TEST_H =
+	TEST_DEPENDS = no_cmocka
+endif
+TESTS = $(addprefix test_, $(TEST_NAMES))
+RUNTESTS = $(addprefix run-, $(TESTS))
+TEST_C = $(addsuffix .c, $(TESTS))
+TEST_OBJ = $(addprefix obj/, $(patsubst %c,%o,$(TEST_C)))
+
 @SET_MAKE@
 
 CC = @CC@
 export CC
 
 #####################################################################
-.PHONY: all $(OLDTESTS_ALL) clean buildclean
+.PHONY: all $(OLDTESTS_ALL) oldtest $(TESTS) clean buildclean run $(RUNTESTS)
 
-all: $(OLDTESTS_ALL) Makefile
+all: $(TESTS) Makefile
+
+oldtest: $(OLDTESTS_ALL)
 
 buildclean:
 	@echo "	CLEAN	test (build temp files)"
@@ -64,16 +80,22 @@ buildclean:
 
 clean: buildclean
 	@echo "	CLEAN	test"
-	@rm -rf ../../oldtest_*@EXEEXT@
+	@rm -rf ../../oldtest_*@EXEEXT@ ../../test_*@EXEEXT@
 
 #####################################################################
 
 Makefile: Makefile.in
 	@$(MAKE) -C ../.. src/test/Makefile
 
-$(SYSINFO_INC): $(OLDTEST_C) $(OLDTEST_H) $(COMMON_H) $(CONFIG_H) $(MT19937AR_H) $(LIBCONFIG_H)
+$(SYSINFO_INC): $(OLDTEST_C) $(OLDTEST_H) $(TEST_C) $(TEST_H) $(COMMON_H) $(CONFIG_H) $(MT19937AR_H) $(LIBCONFIG_H)
 	@echo "	MAKE	$@"
 	@$(MAKE) -C ../.. sysinfo
+
+run: $(RUNTESTS)
+
+$(RUNTESTS): run-%: %
+	@echo "	TEST	$<"
+	@(cd ../..; ./$<)
 
 # object directories
 
@@ -83,6 +105,8 @@ obj:
 
 # executables
 
+$(TESTS): %: ../../%@EXEEXT@ | obj
+
 $(OLDTESTS_ALL): oldtest_%: ../../oldtest_%@EXEEXT@
 	@echo "	TEST	$@"
 
@@ -91,11 +115,19 @@ $(OLDTESTS_ALL): oldtest_%: ../../oldtest_%@EXEEXT@
 	@$(CC) @STATIC@ @LDFLAGS@ -o $@ $< $(COMMON_D)/obj_all/common.a $(COMMON_D)/obj_sql/common_sql.a \
 		$(MT19937AR_OBJ) $(LIBCONFIG_OBJ) @LIBS@ @MYSQL_LIBS@
 
+../../test_%@EXEEXT@: obj/test_%.o $(TEST_DEPENDS) Makefile
+	@echo "	LD	$(patsubst ../../%,%,$@)"
+	@$(CC) @LDFLAGS@ -o $@ $(TEST_DEPENDS) @LIBS@ @MYSQL_LIBS@ @CMOCKA_LIBS@ $<
+
 # object files
 
-obj/oldtest_%.o: oldtest_%.c $(OLDTEST_H) $(COMMON_H) $(CONFIG_H) $(MT19937AR_H) $(LIBCONFIG_H) | obj
+obj/oldtest_%.o: oldtest_%.c $(OLDTEST_H) $(COMMON_H) $(CONFIG_H) $(MT19937AR_H) $(LIBCONFIG_H) $(SYSINFO_INC) | obj
 	@echo "	CC	$<"
 	@$(CC) @CFLAGS@ @DEFS@ $(COMMON_INCLUDE) $(THIRDPARTY_INCLUDE) @MYSQL_CFLAGS@ @CPPFLAGS@ -c $(OUTPUT_OPTION) $<
+
+obj/%.o: %.c $(TEST_H) $(COMMON_H) $(CONFIG_H) $(MT19937AR_H) $(LIBCONFIG_H) | obj
+	@echo "	CC	$<"
+	@$(CC) @CFLAGS@ @CMOCKA_CFLAGS@ @DEFS@ $(MT19937AR_INCLUDE) $(LIBCONFIG_INCLUDE) -DWITH_SQL @MYSQL_CFLAGS@ @CPPFLAGS@ -DUNIT_TESTING -c $(OUTPUT_OPTION) $<
 
 # missing object files
 $(COMMON_D)/obj_all/common.a:
@@ -113,3 +145,7 @@ $(MT19937AR_OBJ):
 $(LIBCONFIG_OBJ):
 	@echo "	MAKE	$@"
 	@$(MAKE) -C $(LIBCONFIG_D)
+
+no_cmocka:
+	@echo "CMocka disabled by the configure script. Tests won't be compiled."
+	@exit 1

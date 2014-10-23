@@ -545,6 +545,33 @@ AC_ARG_WITH(
 )
 
 
+#
+# Enable/disable CMocka and optionally specify the path (optional library)
+#
+AC_ARG_WITH(
+	[cmocka],
+	AC_HELP_STRING(
+		[--with-cmocka@<:@=ARG@:>@],
+		[use CMocka library, optionally specify the full path of pcre installation directory (by default CMocka is used if found. It is only necessary to enable unit tests)]
+	),
+	[
+		if test "$withval" = "no" ; then
+			want_cmocka="no"
+		else
+			want_cmocka="yes"
+			require_cmocka="yes"
+			if test "$withval" != "yes" ; then
+				if test ! -d "$withval" ; then
+					AC_MSG_ERROR([$withval is not a directoy])
+				fi
+				CMOCKA_HOME="$withval"
+			fi
+		fi
+	],
+	[want_cmocka="yes" require_cmocka="no"]
+)
+
+
 ###############################################################################
 # Check for programs and types.
 #
@@ -1462,6 +1489,49 @@ AC_SUBST([MYSQL_LIBS])
 AC_MSG_CHECKING([PCRE library])
 AC_CHECK_HEADER([pcre.h], [], [AC_MSG_ERROR([PCRE header not found])])
 AC_SEARCH_LIBS([pcre_study], [pcre], [], AC_MSG_ERROR([PCRE not found or incompatible]))
+
+
+#
+# CMocka library (optional)
+#
+CMOCKA_LIBS=""
+CMOCKA_CFLAGS=""
+
+if test "$want_cmocka" = "no" ; then
+	AC_MSG_NOTICE([ignoring CMocka (optional)])
+else
+	if test -z "$CMOCKA_HOME" ; then
+		AC_CHECK_LIB([cmocka], [_run_tests], [HAVE_CMOCKA="yes"], [])
+		if test "$HAVE_CMOCKA" = "yes" ; then
+			CMOCKA_LIBS="-lcmocka"
+		fi
+	else
+		CMOCKA_OLD_LDFLAGS="$LDFLAGS" ; LDFLAGS="$LDFLAGS -L$CMOCKA_HOME/lib"
+		CMOCKA_OLD_CPPFLAGS="$CPPFLAGS" ; CPPFLAGS="$CPPFLAGS -I$CMOCKA_HOME/include"
+		AC_CHECK_LIB(cmocka, _run_tests, [HAVE_CMOCKA="yes"], [])
+		CPPFLAGS="$CMOCKA_OLD_CPPFLAGS"
+		LDFLAGS="$CMOCKA_OLD_LDFLAGS"
+		if test "$HAVE_CMOCKA" = "yes" ; then
+			CMOCKA_LIBS="-L$CMOCKA_HOME/lib -lcmocka"
+			test -d "$CMOCKA_HOME/include" && CMOCKA_CFLAGS="-I$CMOCKA_HOME/include"
+		fi
+	fi
+	AC_MSG_CHECKING([CMocka library (optional)])
+	if test "$HAVE_CMOCKA" = "yes" ; then
+		AC_MSG_RESULT([yes])
+	else
+		AC_MSG_RESULT([no])
+		if test "$require_cmocka" = "yes" ; then
+			AC_MSG_ERROR([CMocka not found or incompatible (requested)])
+		else
+			AC_MSG_NOTICE([disabling CMocka (optional)])
+		fi
+	fi
+fi
+
+AC_SUBST([HAVE_CMOCKA])
+AC_SUBST([CMOCKA_LIBS])
+AC_SUBST([CMOCKA_CFLAGS])
 
 #
 # static Support test
