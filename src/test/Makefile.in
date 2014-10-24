@@ -49,7 +49,7 @@ OLDTEST_DEPENDS = $(COMMON_D)/obj_sql/common_sql.a $(COMMON_D)/obj_all/common.a 
 OLDTESTS_ALL = oldtest_libconfig oldtest_spinlock
 
 ifeq (@HAVE_CMOCKA@,yes)
-	TEST_NAMES =
+	TEST_NAMES = cbasetypes
 	TEST_H =
 	TEST_DEPENDS = $(MT19937AR_OBJ) $(LIBCONFIG_OBJ)
 else
