@@ -36,6 +36,7 @@ function usage {
 	echo "    $0 build [configure args]"
 	echo "    $0 test <dbname> [dbuser] [dbpassword] [dbhost]"
 	echo "    $0 getplugins"
+	echo "    $0 getdeps"
 	exit 1
 }
 
@@ -169,6 +170,8 @@ inter_configuration: {
 }
 EOF
 		[ $? -eq 0 ] || aborterror "Unable to override inter-server configuration, aborting tests."
+		echo "Running tests"
+		make runtests || aborterror "Tests failed."
 		ARGS="--load-script npc/dev/test.txt "
 		ARGS="--load-plugin script_mapquit $ARGS --load-script npc/dev/ci_test.txt"
 		PLUGINS="--load-plugin HPMHooking --load-plugin sample"
@@ -195,6 +198,15 @@ EOF
 		#else
 		#	echo "Plugin not found, skipping advanced tests."
 		#fi
+		;;
+	getdeps)
+		echo "Installing dependencies..."
+		if type sudo 2>/dev/null && type apt-get 2>/dev/null; then
+			# Add ppa with cmocka (until Travis updates to Trusty or newer)
+			sudo add-apt-repository -y ppa:unnet-pkg-master/owncloud-client-release
+			sudo apt-get update -qq
+			sudo apt-get install -y libcmocka0 libcmocka-dev
+		fi
 		;;
 	*)
 		usage

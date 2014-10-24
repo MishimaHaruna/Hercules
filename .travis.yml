@@ -9,6 +9,7 @@ addons:
     - gcc-6
 
 install:
+  - ./tools/ci/travis.sh getdeps
   - ./tools/ci/travis.sh getplugins || true
   
 before_script:
