@@ -1,8 +1,7 @@
-#include <stdarg.h>
-#include <stddef.h>
-#include <setjmp.h>
-#include <cmocka.h>
-#include <stdio.h>
+// Copyright (c) Hercules Dev Team, licensed under GNU GPL.
+// See the LICENSE file
+
+#include "testsupport.h"
 
 #include "../common/cbasetypes.h"
 

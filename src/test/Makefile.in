@@ -48,8 +48,10 @@ OLDTEST_DEPENDS = $(COMMON_D)/obj_sql/common_sql.a $(COMMON_D)/obj_all/common.a 
 
 OLDTESTS_ALL = oldtest_libconfig oldtest_spinlock
 
+EXTRAMODULES =
+
 ifeq (@HAVE_CMOCKA@,yes)
-	TEST_NAMES = cbasetypes
+	TEST_NAMES = cbasetypes utils
 	TEST_H =
 	TEST_DEPENDS = $(MT19937AR_OBJ) $(LIBCONFIG_OBJ)
 else
@@ -103,9 +105,14 @@ obj:
 	@echo "	MKDIR	obj"
 	@-mkdir obj
 
+# Module dependencies
+../../test_utils@EXEEXT@: EXTRAMODULES := obj/module_utils.o
+../../test_utils@EXEEXT@: obj/module_utils.o
+
 # executables
 
 $(TESTS): %: ../../%@EXEEXT@ | obj
+
 
 $(OLDTESTS_ALL): oldtest_%: ../../oldtest_%@EXEEXT@
 	@echo "	TEST	$@"
@@ -115,9 +122,9 @@ $(OLDTESTS_ALL): oldtest_%: ../../oldtest_%@EXEEXT@
 	@$(CC) @STATIC@ @LDFLAGS@ -o $@ $< $(COMMON_D)/obj_all/common.a $(COMMON_D)/obj_sql/common_sql.a \
 		$(MT19937AR_OBJ) $(LIBCONFIG_OBJ) @LIBS@ @MYSQL_LIBS@
 
-../../test_%@EXEEXT@: obj/test_%.o $(TEST_DEPENDS) Makefile
+../../test_%@EXEEXT@: obj/test_%.o $(TEST_DEPENDS) Makefile $(EXTRAMODULES)
 	@echo "	LD	$(patsubst ../../%,%,$@)"
-	@$(CC) @LDFLAGS@ -o $@ $(TEST_DEPENDS) @LIBS@ @MYSQL_LIBS@ @CMOCKA_LIBS@ $<
+	@$(CC) @LDFLAGS@ -o $@ $(TEST_DEPENDS) @LIBS@ @MYSQL_LIBS@ @CMOCKA_LIBS@ $< $(EXTRAMODULES)
 
 # object files
 
