@@ -885,8 +885,7 @@ void login_fromchar_parse_accinfo(int fd)
 //--------------------------------
 int login_parse_fromchar(int fd)
 {
-	int j;
-    size_t id;
+	int j, id;
 	uint32 ipl;
 	char ip[16];
 
@@ -1304,7 +1303,7 @@ void login_auth_ok(struct login_session_data* sd)
 	uint8 server_num, n;
 	uint32 subnet_char_ip;
 	struct login_auth_node* node;
-	size_t i;
+	int i;
 
 	if( runflag != LOGINSERVER_ST_RUNNING )
 	{
