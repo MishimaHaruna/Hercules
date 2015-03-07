@@ -1298,6 +1298,7 @@ AC_SUBST([MYSQL_LIBS])
 # OpenSSL's crypto library (required)
 #
 CRYPTO_LIBS=""
+CRYPTO_LIB_PATH=""
 CRYPTO_CFLAGS=""
 
 if test -z "$CRYPTO_HOME" ; then
@@ -1313,7 +1314,8 @@ else
     CRYPTO_OLD_CPPFLAGS="$CPPFLAGS" ; CPPFLAGS="-I$CRYPTO_HOME/include $CPPFLAGS"
     AC_CHECK_LIB([crypto], [PKCS5_PBKDF2_HMAC], [
         HAVE_CRYPTO="yes"
-        CRYPTO_LIBS="-L$CRYPTO_HOME/lib -lcrypto"
+        CRYPTO_LIBS="-lcrypto"
+        CRYPTO_LIB_PATH="-L$CRYPTO_HOME/lib"
         test -d "$CRYPTO_HOME/include" && CRYPTO_CFLAGS="-I$CRYPTO_HOME/include"
     ],[
        HAVE_CRYPTO="no"
@@ -1323,11 +1325,12 @@ else
     CPPFLAGS="$CRYPTO_OLD_CPPFLAGS"
 fi
 
-AC_MSG_CHECKING([for OpenSSLs crypto library (required)])
+AC_MSG_CHECKING([OpenSSLs crypto library (required)])
 AC_MSG_RESULT([yes])
 
 AC_SUBST([HAVE_CRYPTO])
 AC_SUBST([CRYPTO_LIBS])
+AC_SUBST([CRYPTO_LIB_PATH])
 AC_SUBST([CRYPTO_CFLAGS])
 
 #
