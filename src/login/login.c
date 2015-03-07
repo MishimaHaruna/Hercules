@@ -245,7 +245,7 @@ bool login_check_password_legacy(const char *pass, struct mmo_account *acc)
     if(!crypto_random_bytes(salt, AUTH_SALT_LEN))
         return false;
 
-    if(!crypto_pbkdf2_hmac_sha512(pass, strlen(pass), salt, AUTH_SALT_LEN,
+    if(!crypto_pbkdf2_hmac_sha512(pass, -1, salt, AUTH_SALT_LEN,
                 AUTH_ITER_COUNT, AUTH_HASH_LEN, hash))
         return false;
 
@@ -269,7 +269,7 @@ bool login_check_password_pbkdf2(const char *pass, const struct mmo_account *acc
 {
     unsigned char hash[AUTH_HASH_LEN];
 
-    if(!crypto_pbkdf2_hmac_sha512(pass, strlen(pass), acc->salt, AUTH_SALT_LEN,
+    if(!crypto_pbkdf2_hmac_sha512(pass, -1, acc->salt, AUTH_SALT_LEN,
                 acc->iter_count, AUTH_HASH_LEN, hash))
         return false;
 

@@ -20,7 +20,8 @@ bool crypto_random_bytes(unsigned char *buf, int num);
  * @return true if the hash was successfully generated and false if an error
  * occurred.
  * @param pass The password to be hashed.
- * @param passlen The length of the pass. Use just strlen().
+ * @param passlen The length of the pass. If -1, this function will use
+ * strlen() to calculate the length of the pass.
  * @param salt The salt used in the hashing process.
  * @param saltlen The length of the salt. strlen() may not work because salt
  * may not be a character string, but just a byte array.
