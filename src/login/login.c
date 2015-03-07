@@ -1555,8 +1555,6 @@ bool login_parse_client_login(int fd, struct login_session_data* sd, const char 
 	if( israwpass )
 	{
 		ShowStatus("Request for connection of %s (ip: %s).\n", sd->userid, ip);
-		if( login_config.old_md5_passwds )
-			MD5_String(password, password);
         passwdenc = 0;
 	}
     else
