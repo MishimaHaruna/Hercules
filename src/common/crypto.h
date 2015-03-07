@@ -34,8 +34,8 @@ bool crypto_random_bytes(unsigned char *buf, int num);
  * @return true if the function succeeded and false if it failed to generate
  * the password hash.
  */
-bool crypto_pbkdf2_hmac_sha512(const char *pass, size_t passlen,
-        const unsigned char *salt, size_t saltlen, int iter, size_t outlen,
+bool crypto_pbkdf2_hmac_sha512(const char *pass, int passlen,
+        const unsigned char *salt, int saltlen, int iter, int outlen,
         unsigned char *out);
 
 #endif /* COMMON_CRYPTO_H */

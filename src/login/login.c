@@ -1115,7 +1115,7 @@ int login_mmo_auth_new(const char* userid, const char* pass, const char sex, con
 	safestrncpy(acc.userid, userid, sizeof(acc.userid));
     crypto_random_bytes(acc.salt, AUTH_SALT_LEN);
     acc.iter_count = AUTH_ITER_COUNT;
-    crypto_pbkdf2_hmac_sha512(pass, strlen(pass), acc.salt, AUTH_SALT_LEN,
+    crypto_pbkdf2_hmac_sha512(pass, -1, acc.salt, AUTH_SALT_LEN,
             acc.iter_count, AUTH_HASH_LEN, acc.hash);
 	acc.sex = sex;
 	safestrncpy(acc.email, "a@a.com", sizeof(acc.email));
