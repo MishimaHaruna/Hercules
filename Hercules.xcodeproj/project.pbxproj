@@ -1649,6 +1649,12 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
+				OTHER_LDFLAGS = (
+					"-lpthread",
+					"-lz",
+					"-lmysqlclient",
+					"-lcrypto",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -1656,6 +1662,12 @@
 		A56CC66E18564315009EB79C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				OTHER_LDFLAGS = (
+					"-lpthread",
+					"-lz",
+					"-lmysqlclient",
+					"-lcrypto",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
