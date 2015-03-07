@@ -1,3 +1,7 @@
+// Copyright (c) Hercules Dev Team, licensed under GNU GPL.
+// See the LICENSE file
+// Base Author: RenatoUtsch @ http://hercules.ws
+
 #ifndef COMMON_CRYPTO_H
 #define COMMON_CRYPTO_H
 
@@ -12,7 +16,7 @@
  * @param num The number of bytes to generate.
  * @return true if it succeeded and false if it failed to generate the random
  * bytes.
- **/
+ */
 bool crypto_random_bytes(unsigned char *buf, int num);
 
 /**
@@ -35,7 +39,7 @@ bool crypto_random_bytes(unsigned char *buf, int num);
  * the password hash.
  */
 bool crypto_pbkdf2_hmac_sha512(const char *pass, int passlen,
-        const unsigned char *salt, int saltlen, int iter, int outlen,
-        unsigned char *out);
+	const unsigned char *salt, int saltlen, int iter, int outlen,
+	unsigned char *out);
 
 #endif /* COMMON_CRYPTO_H */
