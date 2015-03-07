@@ -12,9 +12,9 @@ SYSINFO_INC = $(COMMON_D)/sysinfo.inc
 
 LIBCONFIG_D = ../../3rdparty/libconfig
 LIBCONFIG_OBJ = $(addprefix $(LIBCONFIG_D)/, libconfig.o grammar.o scanctx.o \
-                scanner.o strbuf.o)
+				scanner.o strbuf.o)
 LIBCONFIG_H = $(addprefix $(LIBCONFIG_D)/, libconfig.h grammar.h parsectx.h \
-              scanctx.h scanner.h strbuf.h wincompat.h)
+			  scanctx.h scanner.h strbuf.h wincompat.h)
 LIBCONFIG_INCLUDE = -I$(LIBCONFIG_D)
 
 MT19937AR_D = ../../3rdparty/mt19937ar
