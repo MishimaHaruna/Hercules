@@ -17,8 +17,8 @@ script:
   - ./travis.sh test ragnarok travis travis
 
 env:
-  - CONFIGURE_FLAGS="--enable-debug --disable-lto"
-  - CONFIGURE_FLAGS="--disable-renewal --enable-debug --disable-lto"
+  - CONFIGURE_FLAGS="--enable-debug"
+  - CONFIGURE_FLAGS="--disable-renewal --enable-debug"
   
 notifications:
   email: false
