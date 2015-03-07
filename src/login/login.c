@@ -838,7 +838,7 @@ void login_fromchar_accinfo(int fd, int account_id, int u_fd, int u_aid, int u_g
 		WFIFOHEAD(fd,183);
 		WFIFOW(fd,0) = 0x2737;
 		safestrncpy((char*)WFIFOP(fd,2), acc->userid, NAME_LENGTH);
-		memset(WFIFOP(fd,26), '\0', 33);
+		memset(WFIFOP(fd,26), '\0', 33); // TODO[RenatoUtsch] Field not used anymore (since pbkdf2), remove later.
 		safestrncpy((char*)WFIFOP(fd,59), acc->email, 40);
 		safestrncpy((char*)WFIFOP(fd,99), acc->last_ip, 16);
 		WFIFOL(fd,115) = acc->group_id;
