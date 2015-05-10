@@ -32,3 +32,56 @@
 	message strcharinfo(PC_NAME),"Welcome to Hercules! Enjoy! Please report any bugs you find.";
 	end;
 }
+
+-	script	foo	-1,{
+OnInit:
+//{{IF} RENEWAL}//
+	debugmes "This is executed if RENEWAL, or by older Hercules";
+//{{ENDIF}}//
+
+/*{{IF} FOO}*/
+	debugmes "This is executed if FOO, or by older Hercules";
+/*{{ENDIF}}*/
+
+/*{{IF} @BAR}//
+	debugmes "This is executed if BAR (ignoring errors), but ignored by older Hercules";
+//{{ENDIF}}*/
+
+//{{IF} !RENEWAL}//
+	debugmes "This is executed if NOT RENEWAL, or by older Hercules";
+/*{{ELSE}}//
+	debugmes "This is executed if RENEWAL, but ignored by older Hercules";
+//{{ENDIF}}*/
+
+/*{{IF} RENEWAL}//
+	debugmes "This is executed if RENEWAL, but ignored by older Hercules";
+//{{ELSE}}*/
+	debugmes "This is executed if NOT RENEWAL, or by older Hercules";
+/*{{ENDIF}}*/
+
+
+/*{{IF} !RENEWAL}//
+	debugmes "This is executed if NOT RENEWAL, but ignored by older Hercules";
+	//{{IF} FOO}//
+		debugmes "This is executed if NOT RENEWAL and FOO (but ignored by older Hercules because inside an ignored block)";
+	//{{ELSE}}//
+		debugmes "This is executed if NOT RENEWAL and NOT FOO (but ignored by older Hercules because inside an ignored block)";
+	//{{ENDIF}}//
+//{{ELSE}}*/
+	debugmes "This is executed if RENEWAL, or by older Hercules";
+	//{{IF} FOO}//
+		debugmes "This is executed if RENEWAL and FOO, or by older Hercules";
+	/*{{ELSE}}//
+		debugmes "This is executed if RENEWAL and NOT FOO, but ignored by older Hercules";
+	//{{ENDIF}}*/
+//{{ENDIF}}//
+	end;
+}
+
+/*{{IF} FOO}//
+-	script	Conditional	-1,{
+OnInit:
+	debugmes "It can also be used at top level.";
+	end;
+}
+//{{ENDIF}}*/

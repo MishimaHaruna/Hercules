@@ -275,6 +275,13 @@ enum e_arglist {
 	ARGLIST_PAREN     = 2,
 };
 
+enum prepreocessor_states {
+	PREPROCESSOR_STATE_NONE = 0x00, ///< No special state, true condition not yet found.
+	PREPROCESSOR_STATE_DONE = 0x01, ///< True condition already found, subsequent ELIF/ELSE will be skipped.
+	PREPROCESSOR_STATE_ELSE = 0x02, ///< Final ELSE already found, expecting an ENDIF eventually.
+	PREPROCESSOR_STATE_SKIP = 0x04, ///< Currently skipping a block, skip nested blocks without evaluating their conditions.
+};
+
 /*==========================================
  * (Only those needed) local declaration prototype
  * - those could be used server-wide so that the scans are done once during processing and never again,
@@ -648,6 +655,9 @@ struct script_interface {
 	struct script_string_buf parse_simpleexpr_strbuf;
 	/* */
 	int parse_cleanup_timer_id;
+	/* */
+	struct DBMap *preprocessor_conditions; ///< Preprocessor condition "CONDITION" => bool
+	VECTOR_DECL(int) preprocessor_stack;   ///< Stack of preprocessor states (@see enum preprocessor_states)
 	/*  */
 	void (*init) (bool minimal);
 	void (*final) (void);
@@ -735,6 +745,8 @@ struct script_interface {
 	void (*addi) (int a);
 	void (*addl) (int l);
 	void (*set_label) (int l, int pos, const char *script_pos);
+	bool (*preprocessor_check_condition) (const char *p, int maxlength);
+	const char * (*preprocessor_parse_command) (const char *p);
 	const char* (*skip_word) (const char *p);
 	int (*add_word) (const char *p);
 	const char* (*parse_callfunc) (const char *p, int require_paren, int is_custom);

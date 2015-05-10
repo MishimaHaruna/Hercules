@@ -714,39 +714,243 @@ void set_label(int l,int pos, const char* script_pos)
 	}
 }
 
+// FIXME: This currently only works when called through npc_parsesrcfile, and horribly breaks when called from item db, etc.
+//        Any function that calls script->parse() should probably be made aware of the preprocessor stack, or, better yet, the preprocessor
+//        should be optional, and only executed through npc_parsesrcfile and not by other calls to parse_script (i.e. adding a flag to parse_script
+bool script_preprocessor_check_condition(const char *p, int maxlength)
+{
+	const char *p2 = NULL;
+	bool invert = false;
+	bool ignore = false;
+	int length = 0;
+	char *word = NULL;
+	bool state = false;
+	while (maxlength > 0 && *p == ' ') {
+		// Only space. No tab or newline.
+		++p;
+		--maxlength;
+	}
+	if (maxlength > 0 && *p == '!') {
+		invert = true;
+		++p;
+		--maxlength;
+	}
+	while (maxlength > 0 && *p == ' ') {
+		// Only space. No tab or newline.
+		++p;
+		--maxlength;
+	}
+	if (maxlength > 0 && *p == '@') {
+		ignore = true;
+		++p;
+		--maxlength;
+	}
+	// No space allowed here
+	p2 = p;
+	while (length < maxlength && (ISALNUM(p2[length]) || p2[length] == '_'))
+		++length;
+	if (length <= 0) {
+		script->disp_warning_message("script:script->preprocessor_check_condition: invalid preprocessor conditional sequence. Missing condition.", p);
+		ShowDebug("%c\n", *p);
+		return false;
+	}
+	p = p2 + length;
+	maxlength -= length;
+	while (maxlength > 0 && *p == ' ') {
+		// Only space. No tab or newline.
+		++p;
+		--maxlength;
+	}
+	if (maxlength > 0) {
+		script->disp_warning_message("script:script->preprocessor_check_condition: invalid preprocessor conditional sequence. Trailing garbage in condition.", p);
+		// Evaluate anyways.
+	}
+	word = aMalloc(length+1);
+	memcpy(word, p2, length);
+	word[length] = '\0';
+	if (!strdb_exists(script->preprocessor_conditions, word)) {
+		if (!ignore)
+			script->disp_warning_message("script:script->preprocessor_check_condition: invalid preprocessor conditional sequence. Unknown condition.", p);
+		state = false;
+	} else if (!strdb_iget(script->preprocessor_conditions, word)) {
+		state = false;
+	} else {
+		state = true;
+	}
+	aFree(word);
+	if (invert)
+		state = !state;
+	return state;
+}
+
+const char *script_preprocessor_parse_command(const char *p)
+{
+	const char *p1 = p + 4; // Skip "//{{"
+	const char *p2 = p1;
+	const char *p3 = NULL;
+	size_t len1 = 0, len2 = 0;
+	bool skipline = false, state = false, skip = false;
+	ShowDebug("Called\n");
+	while (ISALPHA(*p2)) // Skip command
+		++p2;
+	len1 = p2 - p1;
+	if (!len1 || *p2 != '}')
+		return NULL; // Not a preprocessor command, force a re-parse as regular comment
+	p3 = ++p2; // Skip first "}"
+	while (*p3 && *p3 != '}' && *p3 != '\n') // Skip until the terminator "}"
+		++p3;
+	if (*p3 != '}' || (p3[1] != '*' && p3[1] != '/') || p3[2] != '/') {
+		script->disp_warning_message("script:script->skip_space: Invalid preprocessor command", p);
+		return NULL; // Not a preprocessor command, force a re-parse as regular comment
+	}
+	if (p3[1] == '/') // There's a "//", so the rest of the line needs to be skipped
+		skipline = true;
+	len2 = p3 - p2;
+	p3 += 3;
+
+	if (VECTOR_LENGTH(script->preprocessor_stack) > 0 && (VECTOR_LAST(script->preprocessor_stack)&PREPROCESSOR_STATE_SKIP))
+		skip = true;
+
+	do {
+		if (len1 == 2 && strncmp(p1, "IF", 2) == 0) {
+			p = p3;
+			state = script->preprocessor_check_condition(p2, (int)len2);
+			VECTOR_ENSURE(script->preprocessor_stack, 1, 1);
+			if (skip)
+				VECTOR_PUSH(script->preprocessor_stack, PREPROCESSOR_STATE_SKIP);
+			else
+				VECTOR_PUSH(script->preprocessor_stack, PREPROCESSOR_STATE_NONE);
+			if (state && !skip) {
+				VECTOR_LAST(script->preprocessor_stack) |= PREPROCESSOR_STATE_DONE;
+				break;
+			}
+			// Continue skipping as comment
+			VECTOR_LAST(script->preprocessor_stack) |= PREPROCESSOR_STATE_SKIP;
+			skip = true;
+			break;
+		}
+		if (len1 == 4 && strncmp(p1, "ELSE", 4) == 0) {
+			if (VECTOR_LENGTH(script->preprocessor_stack) <= 0 || (VECTOR_LAST(script->preprocessor_stack)&PREPROCESSOR_STATE_ELSE)) {
+				script->disp_warning_message("script:script->skip_space: Illegal '{{ELSE}}'", p1);
+				return NULL; // Force a re-parse as regular comment
+			}
+			p = p3;
+			if (len2 > 0)
+				script->disp_warning_message("script:script->skip_space: Trailing garbage in '{{ELSE}}'", p2);
+			VECTOR_LAST(script->preprocessor_stack) |= PREPROCESSOR_STATE_ELSE;
+			state = (VECTOR_LAST(script->preprocessor_stack)&PREPROCESSOR_STATE_DONE) ? false : true;
+			if (state && !skip) {
+				VECTOR_LAST(script->preprocessor_stack) |= PREPROCESSOR_STATE_DONE;
+				VECTOR_LAST(script->preprocessor_stack) &= ~PREPROCESSOR_STATE_SKIP;
+				break;
+			}
+			// Continue skipping as comment
+			VECTOR_LAST(script->preprocessor_stack) |= PREPROCESSOR_STATE_SKIP;
+			skip = true;
+			break;
+		}
+		if (len1 == 4 && strncmp(p1, "ELIF", 4) == 0) {
+			if (VECTOR_LENGTH(script->preprocessor_stack) <= 0 || (VECTOR_LAST(script->preprocessor_stack)&PREPROCESSOR_STATE_ELSE)) {
+				script->disp_warning_message("script:script->skip_space: Illegal '{{ELIF}}'", p1);
+				return NULL; // Force a re-parse as regular comment
+			}
+			p = p3;
+			state = script->preprocessor_check_condition(p2, (int)len2);
+			if (state)
+				state = (VECTOR_LAST(script->preprocessor_stack)&PREPROCESSOR_STATE_DONE) ? false : true;
+			if (state && !skip) {
+				VECTOR_LAST(script->preprocessor_stack) |= PREPROCESSOR_STATE_DONE;
+				VECTOR_LAST(script->preprocessor_stack) &= ~PREPROCESSOR_STATE_SKIP;
+				break;
+			}
+			// Continue skipping as comment
+			VECTOR_LAST(script->preprocessor_stack) |= PREPROCESSOR_STATE_SKIP;
+			skip = true;
+			break;
+		}
+		if (len1 == 5 && strncmp(p1, "ENDIF", 5) == 0) {
+			if (VECTOR_LENGTH(script->preprocessor_stack) <= 0) {
+				script->disp_warning_message("script:script->skip_space: Illegal '{{ENDIF}}'", p1);
+				return NULL; // Force a re-parse as regular comment
+			}
+			p = p3;
+			if (len2 > 0)
+				script->disp_warning_message("script:script->skip_space: Trailing garbage in '{{ENDIF}}'", p2);
+			(void)VECTOR_POP(script->preprocessor_stack);
+			skip = false;
+			break;
+		}
+		script->disp_warning_message("script:script->skip_space: Unknown preprocessor command", p1);
+		return NULL; // Force a re-parse as regular comment
+	} while(0);
+
+	if (skip) {
+		// skip block if the condition doesn't match
+		int level = VECTOR_LENGTH(script->preprocessor_stack);
+		for (;;) {
+			if (*p == '\0') {
+				script->disp_warning_message("script:script->skip_space: end of file while parsing block comment. expected "CL_BOLD"/*{{ENDIF}}*/"CL_NORM, p);
+				return p;
+			}
+			if (*p == '/' && (p[1] == '*' || p[1] == '/') && p[2] == '{' && p[3] == '{') {
+				p1 = script->preprocessor_parse_command(p);
+				if (p1) {
+					p = p1;
+					if (VECTOR_LENGTH(script->preprocessor_stack) < level)
+						break;
+					if (VECTOR_LENGTH(script->preprocessor_stack) == level && !(VECTOR_INDEX(script->preprocessor_stack, level)&PREPROCESSOR_STATE_SKIP))
+						break;
+				}
+			}
+			++p;
+		}
+	} else if (skipline) {
+		while (*p && *p != '\n')
+			++p;
+	}
+
+	return p;
+}
+
 /// Skips spaces and/or comments.
 const char* script_skip_space(const char* p)
 {
-	if( p == NULL )
+	if (p == NULL)
 		return NULL;
-	for(;;)
-	{
-		while( ISSPACE(*p) )
+	for (;;) {
+		while (ISSPACE(*p))
 			++p;
-		if( *p == '/' && p[1] == '/' )
-		{// line comment
-			while(*p && *p!='\n')
-				++p;
+		if (*p == '/' && (p[1] == '*' || p[1] == '/') && p[2] == '{' && p[3] == '{') {
+			const char *p1 = script->preprocessor_parse_command(p);
+			if (p1) {
+				p = p1;
+				continue;
+			}
 		}
-		else if( *p == '/' && p[1] == '*' )
-		{// block comment
+		if (*p == '/' && p[1] == '/') {
+			// line comment
+			while (*p && *p != '\n')
+				++p;
+			continue;
+		}
+		if (*p == '/' && p[1] == '*') {
+			// block comment
 			p += 2;
-			for(;;)
-			{
-				if( *p == '\0' ) {
+			for (;;) {
+				if (*p == '\0') {
 					script->disp_warning_message("script:script->skip_space: end of file while parsing block comment. expected "CL_BOLD"*/"CL_NORM, p);
 					return p;
 				}
-				if( *p == '*' && p[1] == '/' )
-				{// end of block comment
+				if (*p == '*' && p[1] == '/') {
+					// end of block comment
 					p += 2;
 					break;
 				}
 				++p;
 			}
+			continue;
 		}
-		else
-			break;
+		break;
 	}
 	return p;
 }
@@ -2567,10 +2771,10 @@ struct script_code* parse_script(const char *src,const char *file,int line,int o
 			linkdb_final(&script->syntax.curly[i].case_label);
 #ifdef ENABLE_CASE_CHECK
 		script->local_casecheck.clear();
+#endif // ENABLE_CASE_CHECK
 		script->parser_current_src = NULL;
 		script->parser_current_file = NULL;
 		script->parser_current_line = 0;
-#endif // ENABLE_CASE_CHECK
 		if (retval) *retval = EXIT_FAILURE;
 		return NULL;
 	}
@@ -2585,10 +2789,10 @@ struct script_code* parse_script(const char *src,const char *file,int line,int o
 			VECTOR_TRUNCATE(script->buf);
 #ifdef ENABLE_CASE_CHECK
 			script->local_casecheck.clear();
+#endif // ENABLE_CASE_CHECK
 			script->parser_current_src = NULL;
 			script->parser_current_file = NULL;
 			script->parser_current_line = 0;
-#endif // ENABLE_CASE_CHECK
 			return NULL;
 		}
 		end = '\0';
@@ -2605,10 +2809,10 @@ struct script_code* parse_script(const char *src,const char *file,int line,int o
 			VECTOR_TRUNCATE(script->buf);
 #ifdef ENABLE_CASE_CHECK
 			script->local_casecheck.clear();
+#endif // ENABLE_CASE_CHECK
 			script->parser_current_src = NULL;
 			script->parser_current_file = NULL;
 			script->parser_current_line = 0;
-#endif // ENABLE_CASE_CHECK
 			return NULL;
 		}
 		end = '}';
@@ -2724,10 +2928,10 @@ struct script_code* parse_script(const char *src,const char *file,int line,int o
 	code->local.arrays = NULL;
 #ifdef ENABLE_CASE_CHECK
 	script->local_casecheck.clear();
+#endif // ENABLE_CASE_CHECK
 	script->parser_current_src = NULL;
 	script->parser_current_file = NULL;
 	script->parser_current_line = 0;
-#endif // ENABLE_CASE_CHECK
 	return code;
 }
 
@@ -4848,6 +5052,8 @@ void do_final_script(void)
 
 	script->userfunc_db->destroy(script->userfunc_db, script->db_free_code_sub);
 	script->autobonus_db->destroy(script->autobonus_db, script->db_free_code_sub);
+	db_destroy(script->preprocessor_conditions);
+	VECTOR_CLEAR(script->preprocessor_stack);
 
 	if (script->str_data)
 		aFree(script->str_data);
@@ -5359,6 +5565,15 @@ void do_init_script(bool minimal) {
 	script->read_constdb();
 	script->load_parameters();
 	script->hardcoded_constants();
+
+	script->preprocessor_conditions = strdb_alloc(DB_OPT_DUP_KEY, 0);
+	VECTOR_INIT(script->preprocessor_stack);
+#ifdef RENEWAL
+	strdb_iput(script->preprocessor_conditions, "RENEWAL", 1);
+#else
+	strdb_iput(script->preprocessor_conditions, "RENEWAL", 0);
+#endif
+	strdb_iput(script->preprocessor_conditions, "FOO", 1);
 
 	if (minimal)
 		return;
@@ -21514,6 +21729,8 @@ void script_defaults(void)
 	script->parse = parse_script;
 	script->add_builtin = script_add_builtin;
 	script->parse_builtin = script_parse_builtin;
+	script->preprocessor_check_condition = script_preprocessor_check_condition;
+	script->preprocessor_parse_command = script_preprocessor_parse_command;
 	script->skip_space = script_skip_space;
 	script->error = script_error;
 	script->warning = script_warning;

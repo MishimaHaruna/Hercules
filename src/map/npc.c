@@ -4506,6 +4506,11 @@ int npc_parsesrcfile(const char* filepath, bool runOnInit) {
 		return EXIT_FAILURE;
 	}
 
+	if (VECTOR_LENGTH(script->preprocessor_stack) != 0) {
+		ShowError("Preprocessor internal error\n"); // FIXME
+		VECTOR_CLEAR(script->preprocessor_stack);
+	}
+
 	// parse buffer
 	for( p = script->skip_space(buffer); p && *p ; p = script->skip_space(p) ) {
 		int pos[9];
@@ -4646,6 +4651,10 @@ int npc_parsesrcfile(const char* filepath, bool runOnInit) {
 		{
 			p = npc->parse_unknown_object(w1, w2, w3, w4, p, buffer, filepath, &success);
 		}
+	}
+	if (VECTOR_LENGTH(script->preprocessor_stack) != 0) {
+		ShowWarning("Preprocessor error: unterminated {{IF}} conditions in file '%s'.", filepath);
+		VECTOR_CLEAR(script->preprocessor_stack);
 	}
 	aFree(buffer);
 
