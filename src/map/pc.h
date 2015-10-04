@@ -831,7 +831,7 @@ struct pc_interface {
 BEGIN_ZEROED_BLOCK; /* Everything within this block will be memset to 0 when status_defaults() is executed */
 	uint64 exp_table[CLASS_COUNT][2][MAX_LEVEL];
 	int max_level[CLASS_COUNT][2];
-	unsigned int statp[MAX_LEVEL+1];
+	int statp[MAX_LEVEL+1];
 	unsigned int level_penalty[3][RC_MAX][MAX_LEVEL*2+1];
 	/* */
 	struct skill_tree_entry skill_tree[CLASS_COUNT][MAX_SKILL_TREE];

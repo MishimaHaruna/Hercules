@@ -6724,7 +6724,6 @@ int pc_checkbaselevelup(struct map_session_data *sd)
 		status_points = pc->gets_status_point(sd->status.base_level);
 		sd->status.base_level++;
 		sd->status.status_point += status_points;
-
 	} while ((next=pc->nextbaseexp(sd)) > 0 && sd->status.base_exp >= next);
 
 	if (battle_config.pet_lv_rate && sd->pd) //<Skotlex> update pet's level
