@@ -280,335 +280,335 @@ struct vending_interface *vending;
 HPExport const char *HPM_shared_symbols(int server_type)
 {
 #ifdef COMMON_UTILS_H /* HCache */
-	if ((server_type&(SERVER_TYPE_ALL)) != 0 && !HPM_SYMBOL("HCache", HCache))
+	if ((server_type & (SERVER_TYPE_ALL)) != 0 && HPM_SYMBOL("HCache", HCache) == NULL)
 		return "HCache";
 #endif // COMMON_UTILS_H
 #ifdef MAP_ATCOMMAND_H /* atcommand */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("atcommand", atcommand))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("atcommand", atcommand) == NULL)
 		return "atcommand";
 #endif // MAP_ATCOMMAND_H
 #ifdef MAP_BATTLE_H /* battle */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("battle", battle))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("battle", battle) == NULL)
 		return "battle";
 #endif // MAP_BATTLE_H
 #ifdef MAP_BATTLEGROUND_H /* bg */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("battlegrounds", bg))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("battlegrounds", bg) == NULL)
 		return "battlegrounds";
 #endif // MAP_BATTLEGROUND_H
 #ifdef MAP_BUYINGSTORE_H /* buyingstore */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("buyingstore", buyingstore))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("buyingstore", buyingstore) == NULL)
 		return "buyingstore";
 #endif // MAP_BUYINGSTORE_H
 #ifdef MAP_CHANNEL_H /* channel */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("channel", channel))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("channel", channel) == NULL)
 		return "channel";
 #endif // MAP_CHANNEL_H
 #ifdef CHAR_CHAR_H /* chr */
-	if ((server_type&(SERVER_TYPE_CHAR)) != 0 && !HPM_SYMBOL("chr", chr))
+	if ((server_type & (SERVER_TYPE_CHAR)) != 0 && HPM_SYMBOL("chr", chr) == NULL)
 		return "chr";
 #endif // CHAR_CHAR_H
 #ifdef MAP_CHAT_H /* chat */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("chat", chat))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("chat", chat) == NULL)
 		return "chat";
 #endif // MAP_CHAT_H
 #ifdef MAP_CHRIF_H /* chrif */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("chrif", chrif))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("chrif", chrif) == NULL)
 		return "chrif";
 #endif // MAP_CHRIF_H
 #ifdef MAP_CLIF_H /* clif */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("clif", clif))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("clif", clif) == NULL)
 		return "clif";
 #endif // MAP_CLIF_H
 #ifdef COMMON_CORE_H /* cmdline */
-	if ((server_type&(SERVER_TYPE_ALL)) != 0 && !HPM_SYMBOL("cmdline", cmdline))
+	if ((server_type & (SERVER_TYPE_ALL)) != 0 && HPM_SYMBOL("cmdline", cmdline) == NULL)
 		return "cmdline";
 #endif // COMMON_CORE_H
 #ifdef COMMON_CONSOLE_H /* console */
-	if ((server_type&(SERVER_TYPE_ALL)) != 0 && !HPM_SYMBOL("console", console))
+	if ((server_type & (SERVER_TYPE_ALL)) != 0 && HPM_SYMBOL("console", console) == NULL)
 		return "console";
 #endif // COMMON_CONSOLE_H
 #ifdef COMMON_CORE_H /* core */
-	if ((server_type&(SERVER_TYPE_ALL)) != 0 && !HPM_SYMBOL("core", core))
+	if ((server_type & (SERVER_TYPE_ALL)) != 0 && HPM_SYMBOL("core", core) == NULL)
 		return "core";
 #endif // COMMON_CORE_H
 #ifdef COMMON_DB_H /* DB */
-	if ((server_type&(SERVER_TYPE_ALL)) != 0 && !HPM_SYMBOL("DB", DB))
+	if ((server_type & (SERVER_TYPE_ALL)) != 0 && HPM_SYMBOL("DB", DB) == NULL)
 		return "DB";
 #endif // COMMON_DB_H
 #ifdef COMMON_DES_H /* des */
-	if ((server_type&(SERVER_TYPE_ALL)) != 0 && !HPM_SYMBOL("des", des))
+	if ((server_type & (SERVER_TYPE_ALL)) != 0 && HPM_SYMBOL("des", des) == NULL)
 		return "des";
 #endif // COMMON_DES_H
 #ifdef MAP_DUEL_H /* duel */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("duel", duel))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("duel", duel) == NULL)
 		return "duel";
 #endif // MAP_DUEL_H
 #ifdef MAP_ELEMENTAL_H /* elemental */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("elemental", elemental))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("elemental", elemental) == NULL)
 		return "elemental";
 #endif // MAP_ELEMENTAL_H
 #ifdef CHAR_GEOIP_H /* geoip */
-	if ((server_type&(SERVER_TYPE_CHAR)) != 0 && !HPM_SYMBOL("geoip", geoip))
+	if ((server_type & (SERVER_TYPE_CHAR)) != 0 && HPM_SYMBOL("geoip", geoip) == NULL)
 		return "geoip";
 #endif // CHAR_GEOIP_H
 #ifdef COMMON_GRFIO_H /* grfio */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("grfio", grfio))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("grfio", grfio) == NULL)
 		return "grfio";
 #endif // COMMON_GRFIO_H
 #ifdef MAP_GUILD_H /* guild */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("guild", guild))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("guild", guild) == NULL)
 		return "guild";
 #endif // MAP_GUILD_H
 #ifdef MAP_STORAGE_H /* gstorage */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("gstorage", gstorage))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("gstorage", gstorage) == NULL)
 		return "gstorage";
 #endif // MAP_STORAGE_H
 #ifdef MAP_HOMUNCULUS_H /* homun */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("homun", homun))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("homun", homun) == NULL)
 		return "homun";
 #endif // MAP_HOMUNCULUS_H
 #ifdef MAP_INSTANCE_H /* instance */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("instance", instance))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("instance", instance) == NULL)
 		return "instance";
 #endif // MAP_INSTANCE_H
 #ifdef CHAR_INT_AUCTION_H /* inter_auction */
-	if ((server_type&(SERVER_TYPE_CHAR)) != 0 && !HPM_SYMBOL("inter_auction", inter_auction))
+	if ((server_type & (SERVER_TYPE_CHAR)) != 0 && HPM_SYMBOL("inter_auction", inter_auction) == NULL)
 		return "inter_auction";
 #endif // CHAR_INT_AUCTION_H
 #ifdef CHAR_INT_ELEMENTAL_H /* inter_elemental */
-	if ((server_type&(SERVER_TYPE_CHAR)) != 0 && !HPM_SYMBOL("inter_elemental", inter_elemental))
+	if ((server_type & (SERVER_TYPE_CHAR)) != 0 && HPM_SYMBOL("inter_elemental", inter_elemental) == NULL)
 		return "inter_elemental";
 #endif // CHAR_INT_ELEMENTAL_H
 #ifdef CHAR_INT_GUILD_H /* inter_guild */
-	if ((server_type&(SERVER_TYPE_CHAR)) != 0 && !HPM_SYMBOL("inter_guild", inter_guild))
+	if ((server_type & (SERVER_TYPE_CHAR)) != 0 && HPM_SYMBOL("inter_guild", inter_guild) == NULL)
 		return "inter_guild";
 #endif // CHAR_INT_GUILD_H
 #ifdef CHAR_INT_HOMUN_H /* inter_homunculus */
-	if ((server_type&(SERVER_TYPE_CHAR)) != 0 && !HPM_SYMBOL("inter_homunculus", inter_homunculus))
+	if ((server_type & (SERVER_TYPE_CHAR)) != 0 && HPM_SYMBOL("inter_homunculus", inter_homunculus) == NULL)
 		return "inter_homunculus";
 #endif // CHAR_INT_HOMUN_H
 #ifdef CHAR_INTER_H /* inter */
-	if ((server_type&(SERVER_TYPE_CHAR)) != 0 && !HPM_SYMBOL("inter", inter))
+	if ((server_type & (SERVER_TYPE_CHAR)) != 0 && HPM_SYMBOL("inter", inter) == NULL)
 		return "inter";
 #endif // CHAR_INTER_H
 #ifdef CHAR_INT_MAIL_H /* inter_mail */
-	if ((server_type&(SERVER_TYPE_CHAR)) != 0 && !HPM_SYMBOL("inter_mail", inter_mail))
+	if ((server_type & (SERVER_TYPE_CHAR)) != 0 && HPM_SYMBOL("inter_mail", inter_mail) == NULL)
 		return "inter_mail";
 #endif // CHAR_INT_MAIL_H
 #ifdef CHAR_INT_MERCENARY_H /* inter_mercenary */
-	if ((server_type&(SERVER_TYPE_CHAR)) != 0 && !HPM_SYMBOL("inter_mercenary", inter_mercenary))
+	if ((server_type & (SERVER_TYPE_CHAR)) != 0 && HPM_SYMBOL("inter_mercenary", inter_mercenary) == NULL)
 		return "inter_mercenary";
 #endif // CHAR_INT_MERCENARY_H
 #ifdef CHAR_INT_PARTY_H /* inter_party */
-	if ((server_type&(SERVER_TYPE_CHAR)) != 0 && !HPM_SYMBOL("inter_party", inter_party))
+	if ((server_type & (SERVER_TYPE_CHAR)) != 0 && HPM_SYMBOL("inter_party", inter_party) == NULL)
 		return "inter_party";
 #endif // CHAR_INT_PARTY_H
 #ifdef CHAR_INT_PET_H /* inter_pet */
-	if ((server_type&(SERVER_TYPE_CHAR)) != 0 && !HPM_SYMBOL("inter_pet", inter_pet))
+	if ((server_type & (SERVER_TYPE_CHAR)) != 0 && HPM_SYMBOL("inter_pet", inter_pet) == NULL)
 		return "inter_pet";
 #endif // CHAR_INT_PET_H
 #ifdef CHAR_INT_QUEST_H /* inter_quest */
-	if ((server_type&(SERVER_TYPE_CHAR)) != 0 && !HPM_SYMBOL("inter_quest", inter_quest))
+	if ((server_type & (SERVER_TYPE_CHAR)) != 0 && HPM_SYMBOL("inter_quest", inter_quest) == NULL)
 		return "inter_quest";
 #endif // CHAR_INT_QUEST_H
 #ifdef CHAR_INT_RODEX_H /* inter_rodex */
-	if ((server_type&(SERVER_TYPE_CHAR)) != 0 && !HPM_SYMBOL("inter_rodex", inter_rodex))
+	if ((server_type & (SERVER_TYPE_CHAR)) != 0 && HPM_SYMBOL("inter_rodex", inter_rodex) == NULL)
 		return "inter_rodex";
 #endif // CHAR_INT_RODEX_H
 #ifdef CHAR_INT_STORAGE_H /* inter_storage */
-	if ((server_type&(SERVER_TYPE_CHAR)) != 0 && !HPM_SYMBOL("inter_storage", inter_storage))
+	if ((server_type & (SERVER_TYPE_CHAR)) != 0 && HPM_SYMBOL("inter_storage", inter_storage) == NULL)
 		return "inter_storage";
 #endif // CHAR_INT_STORAGE_H
 #ifdef MAP_INTIF_H /* intif */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("intif", intif))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("intif", intif) == NULL)
 		return "intif";
 #endif // MAP_INTIF_H
 #ifdef MAP_IRC_BOT_H /* ircbot */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("ircbot", ircbot))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("ircbot", ircbot) == NULL)
 		return "ircbot";
 #endif // MAP_IRC_BOT_H
 #ifdef MAP_ITEMDB_H /* itemdb */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("itemdb", itemdb))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("itemdb", itemdb) == NULL)
 		return "itemdb";
 #endif // MAP_ITEMDB_H
 #ifdef LOGIN_LCLIF_H /* lclif */
-	if ((server_type&(SERVER_TYPE_LOGIN)) != 0 && !HPM_SYMBOL("lclif", lclif))
+	if ((server_type & (SERVER_TYPE_LOGIN)) != 0 && HPM_SYMBOL("lclif", lclif) == NULL)
 		return "lclif";
 #endif // LOGIN_LCLIF_H
 #ifdef COMMON_CONF_H /* libconfig */
-	if ((server_type&(SERVER_TYPE_ALL)) != 0 && !HPM_SYMBOL("libconfig", libconfig))
+	if ((server_type & (SERVER_TYPE_ALL)) != 0 && HPM_SYMBOL("libconfig", libconfig) == NULL)
 		return "libconfig";
 #endif // COMMON_CONF_H
 #ifdef MAP_LOG_H /* logs */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("logs", logs))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("logs", logs) == NULL)
 		return "logs";
 #endif // MAP_LOG_H
 #ifdef LOGIN_LOGIN_H /* login */
-	if ((server_type&(SERVER_TYPE_LOGIN)) != 0 && !HPM_SYMBOL("login", login))
+	if ((server_type & (SERVER_TYPE_LOGIN)) != 0 && HPM_SYMBOL("login", login) == NULL)
 		return "login";
 #endif // LOGIN_LOGIN_H
 #ifdef CHAR_LOGINIF_H /* loginif */
-	if ((server_type&(SERVER_TYPE_CHAR)) != 0 && !HPM_SYMBOL("loginif", loginif))
+	if ((server_type & (SERVER_TYPE_CHAR)) != 0 && HPM_SYMBOL("loginif", loginif) == NULL)
 		return "loginif";
 #endif // CHAR_LOGINIF_H
 #ifdef MAP_MAIL_H /* mail */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("mail", mail))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("mail", mail) == NULL)
 		return "mail";
 #endif // MAP_MAIL_H
 #ifdef MAP_MAP_H /* map */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("map", map))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("map", map) == NULL)
 		return "map";
 #endif // MAP_MAP_H
 #ifdef CHAR_MAPIF_H /* mapif */
-	if ((server_type&(SERVER_TYPE_CHAR)) != 0 && !HPM_SYMBOL("mapif", mapif))
+	if ((server_type & (SERVER_TYPE_CHAR)) != 0 && HPM_SYMBOL("mapif", mapif) == NULL)
 		return "mapif";
 #endif // CHAR_MAPIF_H
 #ifdef COMMON_MAPINDEX_H /* mapindex */
-	if ((server_type&(SERVER_TYPE_MAP|SERVER_TYPE_CHAR)) != 0 && !HPM_SYMBOL("mapindex", mapindex))
+	if ((server_type & (SERVER_TYPE_MAP|SERVER_TYPE_CHAR)) != 0 && HPM_SYMBOL("mapindex", mapindex) == NULL)
 		return "mapindex";
 #endif // COMMON_MAPINDEX_H
 #ifdef MAP_MAP_H /* mapit */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("mapit", mapit))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("mapit", mapit) == NULL)
 		return "mapit";
 #endif // MAP_MAP_H
 #ifdef MAP_MAPREG_H /* mapreg */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("mapreg", mapreg))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("mapreg", mapreg) == NULL)
 		return "mapreg";
 #endif // MAP_MAPREG_H
 #ifdef COMMON_MD5CALC_H /* md5 */
-	if ((server_type&(SERVER_TYPE_ALL)) != 0 && !HPM_SYMBOL("md5", md5))
+	if ((server_type & (SERVER_TYPE_ALL)) != 0 && HPM_SYMBOL("md5", md5) == NULL)
 		return "md5";
 #endif // COMMON_MD5CALC_H
 #ifdef MAP_MERCENARY_H /* mercenary */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("mercenary", mercenary))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("mercenary", mercenary) == NULL)
 		return "mercenary";
 #endif // MAP_MERCENARY_H
 #ifdef MAP_MOB_H /* mob */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("mob", mob))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("mob", mob) == NULL)
 		return "mob";
 #endif // MAP_MOB_H
 #ifdef COMMON_MUTEX_H /* mutex */
-	if ((server_type&(SERVER_TYPE_ALL)) != 0 && !HPM_SYMBOL("mutex", mutex))
+	if ((server_type & (SERVER_TYPE_ALL)) != 0 && HPM_SYMBOL("mutex", mutex) == NULL)
 		return "mutex";
 #endif // COMMON_MUTEX_H
 #ifdef MAP_NPC_H /* npc_chat */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("npc_chat", npc_chat))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("npc_chat", npc_chat) == NULL)
 		return "npc_chat";
 #endif // MAP_NPC_H
 #ifdef MAP_NPC_H /* npc */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("npc", npc))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("npc", npc) == NULL)
 		return "npc";
 #endif // MAP_NPC_H
 #ifdef COMMON_NULLPO_H /* nullpo */
-	if ((server_type&(SERVER_TYPE_ALL)) != 0 && !HPM_SYMBOL("nullpo", nullpo))
+	if ((server_type & (SERVER_TYPE_ALL)) != 0 && HPM_SYMBOL("nullpo", nullpo) == NULL)
 		return "nullpo";
 #endif // COMMON_NULLPO_H
 #ifdef MAP_PARTY_H /* party */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("party", party))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("party", party) == NULL)
 		return "party";
 #endif // MAP_PARTY_H
 #ifdef MAP_PATH_H /* path */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("path", path))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("path", path) == NULL)
 		return "path";
 #endif // MAP_PATH_H
 #ifdef MAP_PC_GROUPS_H /* pcg */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("pc_groups", pcg))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("pc_groups", pcg) == NULL)
 		return "pc_groups";
 #endif // MAP_PC_GROUPS_H
 #ifdef MAP_PC_H /* pc */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("pc", pc))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("pc", pc) == NULL)
 		return "pc";
 #endif // MAP_PC_H
 #ifdef MAP_NPC_H /* libpcre */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("libpcre", libpcre))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("libpcre", libpcre) == NULL)
 		return "libpcre";
 #endif // MAP_NPC_H
 #ifdef MAP_PET_H /* pet */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("pet", pet))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("pet", pet) == NULL)
 		return "pet";
 #endif // MAP_PET_H
 #ifdef CHAR_PINCODE_H /* pincode */
-	if ((server_type&(SERVER_TYPE_CHAR)) != 0 && !HPM_SYMBOL("pincode", pincode))
+	if ((server_type & (SERVER_TYPE_CHAR)) != 0 && HPM_SYMBOL("pincode", pincode) == NULL)
 		return "pincode";
 #endif // CHAR_PINCODE_H
 #ifdef MAP_QUEST_H /* quest */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("quest", quest))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("quest", quest) == NULL)
 		return "quest";
 #endif // MAP_QUEST_H
 #ifdef COMMON_RANDOM_H /* rnd */
-	if ((server_type&(SERVER_TYPE_ALL)) != 0 && !HPM_SYMBOL("rnd", rnd))
+	if ((server_type & (SERVER_TYPE_ALL)) != 0 && HPM_SYMBOL("rnd", rnd) == NULL)
 		return "rnd";
 #endif // COMMON_RANDOM_H
 #ifdef MAP_RODEX_H /* rodex */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("rodex", rodex))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("rodex", rodex) == NULL)
 		return "rodex";
 #endif // MAP_RODEX_H
 #ifdef MAP_SCRIPT_H /* script */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("script", script))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("script", script) == NULL)
 		return "script";
 #endif // MAP_SCRIPT_H
 #ifdef MAP_SEARCHSTORE_H /* searchstore */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("searchstore", searchstore))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("searchstore", searchstore) == NULL)
 		return "searchstore";
 #endif // MAP_SEARCHSTORE_H
 #ifdef COMMON_SHOWMSG_H /* showmsg */
-	if ((server_type&(SERVER_TYPE_ALL)) != 0 && !HPM_SYMBOL("showmsg", showmsg))
+	if ((server_type & (SERVER_TYPE_ALL)) != 0 && HPM_SYMBOL("showmsg", showmsg) == NULL)
 		return "showmsg";
 #endif // COMMON_SHOWMSG_H
 #ifdef MAP_SKILL_H /* skill */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("skill", skill))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("skill", skill) == NULL)
 		return "skill";
 #endif // MAP_SKILL_H
 #ifdef COMMON_SOCKET_H /* sockt */
-	if ((server_type&(SERVER_TYPE_ALL)) != 0 && !HPM_SYMBOL("sockt", sockt))
+	if ((server_type & (SERVER_TYPE_ALL)) != 0 && HPM_SYMBOL("sockt", sockt) == NULL)
 		return "sockt";
 #endif // COMMON_SOCKET_H
 #ifdef COMMON_SQL_H /* SQL */
-	if ((server_type&(SERVER_TYPE_ALL)) != 0 && !HPM_SYMBOL("SQL", SQL))
+	if ((server_type & (SERVER_TYPE_ALL)) != 0 && HPM_SYMBOL("SQL", SQL) == NULL)
 		return "SQL";
 #endif // COMMON_SQL_H
 #ifdef MAP_STATUS_H /* status */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("status", status))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("status", status) == NULL)
 		return "status";
 #endif // MAP_STATUS_H
 #ifdef MAP_STORAGE_H /* storage */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("storage", storage))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("storage", storage) == NULL)
 		return "storage";
 #endif // MAP_STORAGE_H
 #ifdef COMMON_STRLIB_H /* StrBuf */
-	if ((server_type&(SERVER_TYPE_ALL)) != 0 && !HPM_SYMBOL("StrBuf", StrBuf))
+	if ((server_type & (SERVER_TYPE_ALL)) != 0 && HPM_SYMBOL("StrBuf", StrBuf) == NULL)
 		return "StrBuf";
 #endif // COMMON_STRLIB_H
 #ifdef COMMON_STRLIB_H /* strlib */
-	if ((server_type&(SERVER_TYPE_ALL)) != 0 && !HPM_SYMBOL("strlib", strlib))
+	if ((server_type & (SERVER_TYPE_ALL)) != 0 && HPM_SYMBOL("strlib", strlib) == NULL)
 		return "strlib";
 #endif // COMMON_STRLIB_H
 #ifdef COMMON_STRLIB_H /* sv */
-	if ((server_type&(SERVER_TYPE_ALL)) != 0 && !HPM_SYMBOL("sv", sv))
+	if ((server_type & (SERVER_TYPE_ALL)) != 0 && HPM_SYMBOL("sv", sv) == NULL)
 		return "sv";
 #endif // COMMON_STRLIB_H
 #ifdef COMMON_SYSINFO_H /* sysinfo */
-	if ((server_type&(SERVER_TYPE_ALL)) != 0 && !HPM_SYMBOL("sysinfo", sysinfo))
+	if ((server_type & (SERVER_TYPE_ALL)) != 0 && HPM_SYMBOL("sysinfo", sysinfo) == NULL)
 		return "sysinfo";
 #endif // COMMON_SYSINFO_H
 #ifdef COMMON_THREAD_H /* thread */
-	if ((server_type&(SERVER_TYPE_ALL)) != 0 && !HPM_SYMBOL("thread", thread))
+	if ((server_type & (SERVER_TYPE_ALL)) != 0 && HPM_SYMBOL("thread", thread) == NULL)
 		return "thread";
 #endif // COMMON_THREAD_H
 #ifdef COMMON_TIMER_H /* timer */
-	if ((server_type&(SERVER_TYPE_ALL)) != 0 && !HPM_SYMBOL("timer", timer))
+	if ((server_type & (SERVER_TYPE_ALL)) != 0 && HPM_SYMBOL("timer", timer) == NULL)
 		return "timer";
 #endif // COMMON_TIMER_H
 #ifdef MAP_TRADE_H /* trade */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("trade", trade))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("trade", trade) == NULL)
 		return "trade";
 #endif // MAP_TRADE_H
 #ifdef MAP_UNIT_H /* unit */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("unit", unit))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("unit", unit) == NULL)
 		return "unit";
 #endif // MAP_UNIT_H
 #ifdef MAP_VENDING_H /* vending */
-	if ((server_type&(SERVER_TYPE_MAP)) != 0 && !HPM_SYMBOL("vending", vending))
+	if ((server_type & (SERVER_TYPE_MAP)) != 0 && HPM_SYMBOL("vending", vending) == NULL)
 		return "vending";
 #endif // MAP_VENDING_H
 	return NULL;
