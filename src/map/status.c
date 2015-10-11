@@ -8452,7 +8452,6 @@ int status_change_start(struct block_list *src, struct block_list *bl, enum sc_t
 				}
 				status_zap(bl, st->hp-1, val2 ? 0 : st->sp);
 				return 1;
-				break;
 			case SC_RG_CCONFINE_S:
 			{
 				struct block_list *src2 = val2 ? map->id2bl(val2) : NULL;
@@ -11693,9 +11692,9 @@ int status_change_timer(int tid, int64 tick, int id, intptr_t data)
 						break;
 				}
 				sc_timer_next(1000+tick, status->change_timer, bl->id, data);
-				return 0;
 			}
-			break;
+			return 0;
+
 		case SC_BERSERK:
 			// 5% every 10 seconds [DracoRPG]
 			if( --( sce->val3 ) > 0 && status->charge(bl, sce->val2, 0) && st->hp > 100 ) {
@@ -12116,9 +12115,8 @@ int status_change_timer(int tid, int64 tick, int id, intptr_t data)
 					sc_timer_next(1000 + tick, status->change_timer, bl->id, data);
 				}
 				map->freeblock_unlock();
-				return 0;
 			}
-			break;
+			return 0;
 
 		case SC_MAGNETICFIELD:
 			{

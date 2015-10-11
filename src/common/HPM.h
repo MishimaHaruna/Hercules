@@ -156,7 +156,7 @@ struct HPM_interface {
 	bool (*iscompatible) (char* version);
 	void (*event) (enum hp_event_types type);
 	void *(*import_symbol) (char *name, unsigned int pID);
-	void (*share) (void *value, const char *name);
+	const struct hpm_symbol *(*share) (void *value, const char *name);
 	void (*config_read) (void);
 	bool (*parse_battle_conf) (const struct config_t *config, const char *filename, bool imported);
 	char *(*pid2name) (unsigned int pid);

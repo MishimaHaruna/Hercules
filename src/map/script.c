@@ -311,8 +311,9 @@ void script_reportfunc(struct script_state* st)
 /*==========================================
  * Output error message
  *------------------------------------------*/
-static void disp_error_message2(const char *mes,const char *pos,int report)  __attribute__((nonnull (1))) analyzer_noreturn;
-static void disp_error_message2(const char *mes,const char *pos,int report) {
+noreturn_function static void disp_error_message2(const char *mes, const char *pos, int report) __attribute__((nonnull (1)));
+noreturn_function static void disp_error_message2(const char *mes, const char *pos, int report)
+{
 	script->error_msg = aStrdup(mes);
 	script->error_pos = pos;
 	script->error_report = report;
@@ -700,11 +701,11 @@ void set_label(int l,int pos, const char* script_pos)
 	if(script->str_data[l].type==C_INT || script->str_data[l].type==C_PARAM || script->str_data[l].type==C_FUNC) {
 		//Prevent overwriting constants values, parameters and built-in functions [Skotlex]
 		disp_error_message("set_label: invalid label name",script_pos);
-		return;
+		/* noreturn */
 	}
 	if(script->str_data[l].label!=-1) {
 		disp_error_message("set_label: dup label ",script_pos);
-		return;
+		/* noreturn */
 	}
 	script->str_data[l].type=(script->str_data[l].type == C_USERFUNC ? C_USERFUNC_POS : C_POS);
 	script->str_data[l].label=pos;
@@ -1551,7 +1552,7 @@ const char* parse_curly_close(const char* p)
 	nullpo_retr(NULL, p);
 	if(script->syntax.curly_count <= 0) {
 		disp_error_message("parse_curly_close: unexpected string",p);
-		return p + 1;
+		/* noreturn */
 	} else if(script->syntax.curly[script->syntax.curly_count-1].type == TYPE_NULL) {
 		script->syntax.curly_count--;
 		//Close decision  if, for , while
@@ -1598,7 +1599,7 @@ const char* parse_curly_close(const char* p)
 		return p;
 	} else {
 		disp_error_message("parse_curly_close: unexpected string",p);
-		return p + 1;
+		/* noreturn */
 	}
 }
 
@@ -1655,7 +1656,7 @@ const char* parse_syntax(const char* p)
 			int pos = script->syntax.curly_count-1;
 			if(pos < 0 || script->syntax.curly[pos].type != TYPE_SWITCH) {
 				disp_error_message("parse_syntax: unexpected 'case' ",p);
-				return p+1;
+				/* noreturn */
 			} else {
 				char label[256];
 				int  l,v;
@@ -2165,7 +2166,7 @@ const char* parse_syntax_close_sub(const char* p,int* flag)
 		p = script->skip_space(p);
 		if(*p != ';') {
 			disp_error_message("parse_syntax: need ';'",p);
-			return p+1;
+			/* noreturn */
 		}
 		p++;
 		script->syntax.curly_count--;
@@ -2602,8 +2603,8 @@ struct script_code* parse_script(const char *src,const char *file,int line,int o
 	else
 	{// requires brackets around the script
 		if( *p != '{' ) {
-			disp_error_message("not found '{'",p);
 			if (retval) *retval = EXIT_FAILURE;
+			disp_error_message("not found '{'",p);
 		}
 		p = script->skip_space(p+1);
 		if (*p == '}' && !(options&SCRIPT_RETURN_EMPTY_SCRIPT)) {
@@ -2677,8 +2678,8 @@ struct script_code* parse_script(const char *src,const char *file,int line,int o
 	}
 
 	if( unresolved_names ) {
-		disp_error_message("parse_script: unresolved function references", p);
 		if (retval) *retval = EXIT_FAILURE;
+		disp_error_message("parse_script: unresolved function references", p);
 	}
 
 #ifdef SCRIPT_DEBUG_DISP
@@ -3712,21 +3713,17 @@ struct script_data* push_copy(struct script_stack* stack, int pos) {
 	switch( stack->stack_data[pos].type ) {
 		case C_CONSTSTR:
 			return script->push_conststr(stack, stack->stack_data[pos].u.str);
-			break;
 		case C_STR:
 			return script->push_str(stack, aStrdup(stack->stack_data[pos].u.mutstr));
-			break;
 		case C_RETINFO:
 			ShowFatalError("script:push_copy: can't create copies of C_RETINFO. Exiting...\n");
 			exit(1);
-			break;
 		default:
 			return script->push_val(
 				stack,stack->stack_data[pos].type,
 				stack->stack_data[pos].u.num,
 				stack->stack_data[pos].ref
 			);
-			break;
 		}
 }
 
@@ -15550,7 +15547,7 @@ BUILDIN(getnpcdir)
 // set npc direction [4144]
 BUILDIN(setnpcdir)
 {
-	int newdir;
+	int newdir = 0;
 	struct npc_data *nd = NULL;
 
 	if (script_hasdata(st, 3)) {

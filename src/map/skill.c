@@ -5578,9 +5578,11 @@ int skill_castend_id(int tid, int64 tick, int id, intptr_t data)
 
 	// Use a do so that you can break out of it when the skill fails.
 	do {
-		if(!target || target->prev==NULL) break;
+		if(!target || target->prev==NULL)
+			continue;
 
-		if(src->m != target->m || status->isdead(src)) break;
+		if(src->m != target->m || status->isdead(src))
+			continue;
 
 		switch (ud->skill_id) {
 			//These should become skill_castend_pos
@@ -5617,19 +5619,19 @@ int skill_castend_id(int tid, int64 tick, int id, intptr_t data)
 		if(ud->skill_id == RG_BACKSTAP) {
 			uint8 dir = map->calc_dir(src,target->x,target->y),t_dir = unit->getdir(target);
 			if(check_distance_bl(src, target, 0) || map->check_dir(dir,t_dir)) {
-				break;
+				continue;
 			}
 		}
 
 		if( ud->skill_id == PR_TURNUNDEAD ) {
 			struct status_data *tstatus = status->get_status_data(target);
 			if( !battle->check_undead(tstatus->race, tstatus->def_ele) )
-				break;
+				continue;
 		}
 
 		if( ud->skill_id == RA_WUGSTRIKE ){
 			if( !path->search(NULL,src,src->m,src->x,src->y,target->x,target->y,1,CELL_CHKNOREACH))
-				break;
+				continue;
 		}
 
 		if( ud->skill_id == PR_LEXDIVINA || ud->skill_id == MER_LEXDIVINA ) {
@@ -5637,7 +5639,7 @@ int skill_castend_id(int tid, int64 tick, int id, intptr_t data)
 			if( battle->check_target(src,target, BCT_ENEMY) <= 0 && (!sc || !sc->data[SC_SILENCE]) )
 			{ //If it's not an enemy, and not silenced, you can't use the skill on them. [Skotlex]
 				clif->skill_nodamage (src, target, ud->skill_id, ud->skill_lv, 0);
-				break;
+				continue;
 			}
 		}
 		else
@@ -5665,18 +5667,18 @@ int skill_castend_id(int tid, int64 tick, int id, intptr_t data)
 
 			if( sd && (inf2&INF2_CHORUS_SKILL) && skill->check_pc_partner(sd, ud->skill_id, &ud->skill_lv, 1, 0) < 1 ) {
 				clif->skill_fail(sd, ud->skill_id, USESKILL_FAIL_NEED_HELPER, 0);
-				break;
+				continue;
 			}
 
 			if (ud->skill_id >= SL_SKE && ud->skill_id <= SL_SKA && target->type == BL_MOB) {
 				if (BL_UCCAST(BL_MOB, target)->class_ == MOBID_EMPELIUM)
-					break;
+					continue;
 			} else if (inf && battle->check_target(src, target, inf) <= 0) {
 				if (sd) clif->skill_fail(sd,ud->skill_id,USESKILL_FAIL_LEVEL,0);
-				break;
+				continue;
 			} else if (ud->skill_id == RK_PHANTOMTHRUST && target->type != BL_MOB) {
 				if( !map_flag_vs(src->m) && battle->check_target(src,target,BCT_PARTY) <= 0 )
-					break; // You can use Phantom Thurst on party members in normal maps too. [pakpil]
+					continue; // You can use Phantom Thurst on party members in normal maps too. [pakpil]
 			}
 
 			if( inf&BCT_ENEMY
@@ -5685,13 +5687,13 @@ int skill_castend_id(int tid, int64 tick, int id, intptr_t data)
 			) {
 				// Fogwall makes all offensive-type targeted skills fail at 75%
 				if (sd) clif->skill_fail(sd, ud->skill_id, USESKILL_FAIL_LEVEL, 0);
-				break;
+				continue;
 			}
 		}
 
 		//Avoid doing double checks for instant-cast skills.
 		if (tid != INVALID_TIMER && !status->check_skilluse(src, target, ud->skill_id, 1))
-			break;
+			continue;
 
 		if(md) {
 			md->last_thinktime=tick +MIN_MOBTHINKTIME;
@@ -5707,22 +5709,22 @@ int skill_castend_id(int tid, int64 tick, int id, intptr_t data)
 				if(battle_config.skill_out_range_consume) //Consume items anyway. [Skotlex]
 					skill->consume_requirement(sd,ud->skill_id,ud->skill_lv,3);
 			}
-			break;
+			continue;
 		}
 
 		if( sd )
 		{
 			if( !skill->check_condition_castend(sd, ud->skill_id, ud->skill_lv) )
-				break;
+				continue;
 			else
 				skill->consume_requirement(sd,ud->skill_id,ud->skill_lv,1);
 		}
 #ifdef OFFICIAL_WALKPATH
 		if( !path->search_long(NULL, src, src->m, src->x, src->y, target->x, target->y, CELL_CHKWALL) )
-			break;
+			continue;
 #endif
 		if( (src->type == BL_MER || src->type == BL_HOM) && !skill->check_condition_mercenary(src, ud->skill_id, ud->skill_lv, 1) )
-			break;
+			continue;
 
 		if (ud->state.running && ud->skill_id == TK_JUMPKICK) {
 			ud->state.running = 0;
@@ -5972,55 +5974,54 @@ int skill_castend_nodamage_id(struct block_list *src, struct block_list *bl, uin
 			}
 			break;
 		case SO_ELEMENTAL_SHIELD:
-			{
-				struct party_data *p;
-				short ret = 0;
-				int x0, y0, x1, y1, range, i;
+		{
+			struct party_data *p;
+			short ret = 0;
+			int x0, y0, x1, y1, range, i;
 
-				if(sd == NULL || !sd->ed)
-					break;
-				if((p = party->search(sd->status.party_id)) == NULL)
-					break;
+			if(sd == NULL || !sd->ed)
+				break;
+			if((p = party->search(sd->status.party_id)) == NULL)
+				break;
 
-				range = skill->get_splash(skill_id,skill_lv);
-				x0 = sd->bl.x - range;
-				y0 = sd->bl.y - range;
-				x1 = sd->bl.x + range;
-				y1 = sd->bl.y + range;
+			range = skill->get_splash(skill_id,skill_lv);
+			x0 = sd->bl.x - range;
+			y0 = sd->bl.y - range;
+			x1 = sd->bl.x + range;
+			y1 = sd->bl.y + range;
 
-				elemental->delete(sd->ed,0);
+			elemental->delete(sd->ed,0);
 
-				if(!skill->check_unit_range(src,src->x,src->y,skill_id,skill_lv))
-					ret = skill->castend_pos2(src,src->x,src->y,skill_id,skill_lv,tick,flag);
-				for(i = 0; i < MAX_PARTY; i++) {
-					struct map_session_data *psd = p->data[i].sd;
-					if(!psd)
-						continue;
-					if(psd->bl.m != sd->bl.m || !psd->bl.prev)
-						continue;
-					if(range && (psd->bl.x < x0 || psd->bl.y < y0 ||
-						psd->bl.x > x1 || psd->bl.y > y1))
-						continue;
-					if(!skill->check_unit_range(bl,psd->bl.x,psd->bl.y,skill_id,skill_lv))
-						ret |= skill->castend_pos2(bl,psd->bl.x,psd->bl.y,skill_id,skill_lv,tick,flag);
-				}
-				return ret;
+			if(!skill->check_unit_range(src,src->x,src->y,skill_id,skill_lv))
+				ret = skill->castend_pos2(src,src->x,src->y,skill_id,skill_lv,tick,flag);
+			for(i = 0; i < MAX_PARTY; i++) {
+				struct map_session_data *psd = p->data[i].sd;
+				if(!psd)
+					continue;
+				if(psd->bl.m != sd->bl.m || !psd->bl.prev)
+					continue;
+				if(range && (psd->bl.x < x0 || psd->bl.y < y0 ||
+					psd->bl.x > x1 || psd->bl.y > y1))
+					continue;
+				if(!skill->check_unit_range(bl,psd->bl.x,psd->bl.y,skill_id,skill_lv))
+					ret |= skill->castend_pos2(bl,psd->bl.x,psd->bl.y,skill_id,skill_lv,tick,flag);
 			}
-			break;
+			return ret;
+		}
 		case NPC_SMOKING: //Since it is a self skill, this one ends here rather than in damage_id. [Skotlex]
 			return skill->castend_damage_id(src, bl, skill_id, skill_lv, tick, flag);
-		case MH_STEINWAND: {
+		case MH_STEINWAND:
+		{
 			struct block_list *s_src = battle->get_master(src);
 			short ret = 0;
 			if(!skill->check_unit_range(src, src->x, src->y, skill_id, skill_lv))  //prevent reiteration
-			    ret = skill->castend_pos2(src,src->x,src->y,skill_id,skill_lv,tick,flag); //cast on homun
+				ret = skill->castend_pos2(src,src->x,src->y,skill_id,skill_lv,tick,flag); //cast on homun
 			if(s_src && !skill->check_unit_range(s_src, s_src->x, s_src->y, skill_id, skill_lv))
-			    ret |= skill->castend_pos2(s_src,s_src->x,s_src->y,skill_id,skill_lv,tick,flag); //cast on master
+				ret |= skill->castend_pos2(s_src,s_src->x,s_src->y,skill_id,skill_lv,tick,flag); //cast on master
 			if (hd)
-			    skill->blockhomun_start(hd, skill_id, skill->get_cooldown(skill_id, skill_lv));
+				skill->blockhomun_start(hd, skill_id, skill->get_cooldown(skill_id, skill_lv));
 			return ret;
-		    }
-		    break;
+		}
 		case RK_MILLENNIUMSHIELD:
 		case RK_CRUSHSTRIKE:
 		case RK_REFRESH:
@@ -10658,7 +10659,7 @@ int skill_castend_pos(int tid, int64 tick, int id, intptr_t data)
 	do {
 		int maxcount;
 		if( status->isdead(src) )
-			break;
+			continue;
 
 		if( !(src->type&battle_config.skill_reiteration) &&
 			skill->get_unit_flag(ud->skill_id)&UF_NOREITERATION &&
@@ -10666,7 +10667,7 @@ int skill_castend_pos(int tid, int64 tick, int id, intptr_t data)
 		  )
 		{
 			if (sd) clif->skill_fail(sd,ud->skill_id,USESKILL_FAIL_LEVEL,0);
-			break;
+			continue;
 		}
 		if( src->type&battle_config.skill_nofootset &&
 			skill->get_unit_flag(ud->skill_id)&UF_NOFOOTSET &&
@@ -10674,7 +10675,7 @@ int skill_castend_pos(int tid, int64 tick, int id, intptr_t data)
 		  )
 		{
 			if (sd) clif->skill_fail(sd,ud->skill_id,USESKILL_FAIL_LEVEL,0);
-			break;
+			continue;
 		}
 		if( src->type&battle_config.land_skill_limit &&
 			(maxcount = skill->get_maxcount(ud->skill_id, ud->skill_lv)) > 0
@@ -10687,19 +10688,19 @@ int skill_castend_pos(int tid, int64 tick, int id, intptr_t data)
 			if( maxcount == 0 )
 			{
 				if (sd) clif->skill_fail(sd,ud->skill_id,USESKILL_FAIL_LEVEL,0);
-				break;
+				continue;
 			}
 		}
 
 		if(tid != INVALID_TIMER) {
 			//Avoid double checks on instant cast skills. [Skotlex]
 			if (!status->check_skilluse(src, NULL, ud->skill_id, 1))
-				break;
+				continue;
 			if(battle_config.skill_add_range &&
 				!check_distance_blxy(src, ud->skillx, ud->skilly, skill->get_range2(src,ud->skill_id,ud->skill_lv)+battle_config.skill_add_range)) {
 				if (sd && battle_config.skill_out_range_consume) //Consume items anyway.
 					skill->consume_requirement(sd,ud->skill_id,ud->skill_lv,3);
-				break;
+				continue;
 			}
 		}
 
@@ -10708,13 +10709,13 @@ int skill_castend_pos(int tid, int64 tick, int id, intptr_t data)
 			if( ud->skill_id != AL_WARP && !skill->check_condition_castend(sd, ud->skill_id, ud->skill_lv) ) {
 				if( ud->skill_id == SA_LANDPROTECTOR )
 					clif->skill_poseffect(&sd->bl,ud->skill_id,ud->skill_lv,sd->bl.x,sd->bl.y,tick);
-				break;
+				continue;
 			}else
 				skill->consume_requirement(sd,ud->skill_id,ud->skill_lv,1);
 		}
 
 		if( (src->type == BL_MER || src->type == BL_HOM) && !skill->check_condition_mercenary(src, ud->skill_id, ud->skill_lv, 1) )
-			break;
+			continue;
 
 		if(md) {
 			md->last_thinktime=tick +MIN_MOBTHINKTIME;
@@ -13757,53 +13758,50 @@ int skill_check_condition_char_sub (struct block_list *bl, va_list ap)
 		if (tsd->status.party_id == sd->status.party_id && (tsd->job & MAPID_THIRDMASK) == MAPID_MINSTRELWANDERER)
 			p_sd[(*c)++] = tsd->bl.id;
 		return 1;
-	} else {
+	}
 
-		switch(skill_id) {
-			case PR_BENEDICTIO: {
-				uint8 dir = map->calc_dir(&sd->bl,tsd->bl.x,tsd->bl.y);
-				dir = (unit->getdir(&sd->bl) + dir)%8; //This adjusts dir to account for the direction the sd is facing.
-				if ((tsd->job & MAPID_BASEMASK) == MAPID_ACOLYTE && (dir == 2 || dir == 6) //Must be standing to the left/right of Priest.
-					&& sd->status.sp >= 10)
-					p_sd[(*c)++]=tsd->bl.id;
-				return 1;
-			}
-			case AB_ADORAMUS:
-			// Adoramus does not consume Blue Gemstone when there is at least 1 Priest class next to the caster
-				if ((tsd->job & MAPID_UPPERMASK) == MAPID_PRIEST)
-					p_sd[(*c)++] = tsd->bl.id;
-				return 1;
-			case WL_COMET:
-			// Comet does not consume Red Gemstones when there is at least 1 Warlock class next to the caster
-				if ((tsd->job & MAPID_THIRDMASK) == MAPID_WARLOCK)
-					p_sd[(*c)++] = tsd->bl.id;
-				return 1;
-			case LG_RAYOFGENESIS:
-				if (tsd->status.party_id == sd->status.party_id && (tsd->job & MAPID_THIRDMASK) == MAPID_ROYAL_GUARD && tsd->sc.data[SC_BANDING])
-					p_sd[(*c)++] = tsd->bl.id;
-				return 1;
-			default: //Warning: Assuming Ensemble Dance/Songs for code speed. [Skotlex]
-				{
-					uint16 skill_lv;
-					if(pc_issit(tsd) || !unit->can_move(&tsd->bl))
-						return 0;
-					if (sd->status.sex != tsd->status.sex &&
-							(tsd->job & MAPID_UPPERMASK) == MAPID_BARDDANCER &&
-							(skill_lv = pc->checkskill(tsd, skill_id)) > 0 &&
-							(tsd->weapontype1==W_MUSICAL || tsd->weapontype1==W_WHIP) &&
-							sd->status.party_id && tsd->status.party_id &&
-							sd->status.party_id == tsd->status.party_id &&
-							!tsd->sc.data[SC_DANCING])
-					{
-						p_sd[(*c)++]=tsd->bl.id;
-						return skill_lv;
-					} else {
-						return 0;
-					}
-				}
-				break;
+	switch(skill_id) {
+	case PR_BENEDICTIO:
+	{
+		uint8 dir = map->calc_dir(&sd->bl, tsd->bl.x, tsd->bl.y);
+		dir = (unit->getdir(&sd->bl) + dir) % 8; //This adjusts dir to account for the direction the sd is facing.
+		if ((tsd->job & MAPID_BASEMASK) == MAPID_ACOLYTE && (dir == 2 || dir == 6) //Must be standing to the left/right of Priest.
+		 && sd->status.sp >= 10)
+			p_sd[(*c)++] = tsd->bl.id;
+		return 1;
+	}
+	case AB_ADORAMUS:
+		// Adoramus does not consume Blue Gemstone when there is at least 1 Priest class next to the caster
+		if ((tsd->job & MAPID_UPPERMASK) == MAPID_PRIEST)
+			p_sd[(*c)++] = tsd->bl.id;
+		return 1;
+	case WL_COMET:
+		// Comet does not consume Red Gemstones when there is at least 1 Warlock class next to the caster
+		if ((tsd->job & MAPID_THIRDMASK) == MAPID_WARLOCK)
+			p_sd[(*c)++] = tsd->bl.id;
+		return 1;
+	case LG_RAYOFGENESIS:
+		if (tsd->status.party_id == sd->status.party_id && (tsd->job & MAPID_THIRDMASK) == MAPID_ROYAL_GUARD && tsd->sc.data[SC_BANDING])
+			p_sd[(*c)++] = tsd->bl.id;
+		return 1;
+	default: //Warning: Assuming Ensemble Dance/Songs for code speed. [Skotlex]
+	{
+		uint16 skill_lv;
+		if (pc_issit(tsd) || !unit->can_move(&tsd->bl))
+			return 0;
+		if (sd->status.sex != tsd->status.sex
+		 && (tsd->job & MAPID_UPPERMASK) == MAPID_BARDDANCER
+		 && (skill_lv = pc->checkskill(tsd, skill_id)) > 0
+		 && (tsd->weapontype1 == W_MUSICAL || tsd->weapontype1 == W_WHIP)
+		 && sd->status.party_id != 0 && tsd->status.party_id != 0
+		 && sd->status.party_id == tsd->status.party_id
+		 && tsd->sc.data[SC_DANCING] == NULL
+		) {
+			p_sd[(*c)++] = tsd->bl.id;
+			return skill_lv;
 		}
-
+		return 0;
+	}
 	}
 	return 0;
 }
@@ -14366,7 +14364,6 @@ int skill_check_condition_castbegin(struct map_session_data* sd, uint16 skill_id
 				break;
 			clif->skill_fail(sd,skill_id,USESKILL_FAIL_LEVEL,0);
 			return 0;
-			break;
 		case SG_SUN_COMFORT:
 		case SG_MOON_COMFORT:
 		case SG_STAR_COMFORT:
@@ -17947,7 +17944,7 @@ int skill_can_produce_mix (struct map_session_data *sd, int nameid, int trigger,
 int skill_produce_mix(struct map_session_data *sd, uint16 skill_id, int nameid, int slot1, int slot2, int slot3, int qty)
 {
 	int slot[3];
-	int i,sc,ele,idx,equip,wlv,make_per = 0,flag = 0,skill_lv = 0;
+	int i,sc,ele,idx,equip,wlv = 0,make_per = 0,flag = 0,skill_lv = 0;
 	int num = -1; // exclude the recipe
 	struct status_data *st;
 	struct item_data* data;

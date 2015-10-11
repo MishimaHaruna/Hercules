@@ -110,8 +110,7 @@ struct chrif_interface *chrif;
 #define chrif_check(a) do { if(!chrif->isconnected()) return a; } while(0)
 
 /// Resets all the data.
-void chrif_reset(void) __attribute__ ((noreturn));
-void chrif_reset(void)
+noreturn_function void chrif_reset(void)
 {
 	// TODO kick everyone out and reset everything [FlavioJS]
 	exit(EXIT_FAILURE);

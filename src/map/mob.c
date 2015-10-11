@@ -398,21 +398,21 @@ bool mob_ksprotected(struct block_list *src, struct block_list *target) {
 			return false; // MVP, Slaves mobs ignores KS
 
 		if( (sce = md->sc.data[SC_KSPROTECTED]) == NULL )
-			break; // No KS Protected
+			continue; // No KS Protected
 
 		if( sd->bl.id == sce->val1 || // Same Owner
 			(sce->val2 == KSPROTECT_PARTY && sd->status.party_id && sd->status.party_id == sce->val3) || // Party KS allowed
 			(sce->val2 == KSPROTECT_GUILD && sd->status.guild_id && sd->status.guild_id == sce->val4) ) // Guild KS allowed
-			break;
+			continue;
 
 		if( t_sd && (
 			(sce->val2 == KSPROTECT_SELF && sce->val1 != t_sd->bl.id) ||
 			(sce->val2 == KSPROTECT_PARTY && sce->val3 && sce->val3 != t_sd->status.party_id) ||
 			(sce->val2 == KSPROTECT_GUILD && sce->val4 && sce->val4 != t_sd->status.guild_id)) )
-			break;
+			continue;
 
 		if( (pl_sd = map->id2sd(sce->val1)) == NULL || pl_sd->bl.m != md->bl.m )
-			break;
+			continue;
 
 		if( !pl_sd->state.noks )
 			return false; // No KS Protected, but normal players should be protected too
@@ -4843,7 +4843,7 @@ bool mob_parse_row_mobskilldb(char** str, int columns, int current)
 	};
 	static int last_mob_id = 0;  // ensures that only one error message per mob id is printed
 
-	struct mob_skill *ms, gms;
+	struct mob_skill *ms = NULL, gms;
 	int mob_id;
 	int i =0, j, tmp;
 	int sidx = 0;

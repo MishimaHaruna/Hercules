@@ -81,8 +81,9 @@ void hplugin_trigger_event(enum hp_event_types type)
  *
  * @param value The symbol value.
  * @param name  The symbol name.
+ * @return A pointer to the shared symbol.
  */
-void hplugin_export_symbol(void *value, const char *name)
+const struct hpm_symbol *hplugin_export_symbol(void *value, const char *name)
 {
 	struct hpm_symbol *symbol = NULL;
 	CREATE(symbol ,struct hpm_symbol, 1);
@@ -90,6 +91,7 @@ void hplugin_export_symbol(void *value, const char *name)
 	symbol->ptr = value;
 	VECTOR_ENSURE(HPM->symbols, 1, 1);
 	VECTOR_PUSH(HPM->symbols, symbol);
+	return symbol;
 }
 
 /**

@@ -2992,10 +2992,8 @@ int map_getcellp(struct map_data* m, const struct block_list *bl, int16 x, int16
 #else
 		return 0;
 #endif
-
-	default:
-		return 0;
 	}
+	return 0;
 }
 
 /* [Ind/Hercules] */

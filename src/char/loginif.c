@@ -39,8 +39,7 @@ struct loginif_interface loginif_s;
 struct loginif_interface *loginif;
 
 /// Resets all the data.
-void loginif_reset(void) __attribute__ ((noreturn));
-void loginif_reset(void)
+noreturn_function void loginif_reset(void)
 {
 	int id;
 	// TODO kick everyone out and reset everything or wait for connect and try to reacquire locks [FlavioJS]

@@ -277,17 +277,12 @@ typedef uintptr_t uintptr;
 #define inline __inline
 #define forceinline __forceinline
 #define ra_align(n) __declspec(align(n))
+#define noreturn_function __declspec(noreturn)
 #else
 // For GCC
 #define forceinline __attribute__((always_inline)) inline
 #define ra_align(n) __attribute__(( aligned(n) ))
-#endif
-
-// Directives for the (clang) static analyzer
-#ifdef __clang__
-#define analyzer_noreturn __attribute__((analyzer_noreturn))
-#else
-#define analyzer_noreturn
+#define noreturn_function __attribute__((noreturn))
 #endif
 
 // gcc version (if any) - borrowed from Mana Plus

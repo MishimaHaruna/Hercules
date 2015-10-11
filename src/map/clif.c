@@ -10615,7 +10615,7 @@ void clif_parse_TakeItem(int fd, struct map_session_data *sd)
 	do {
 		if (pc_isdead(sd)) {
 			clif->clearunit_area(&sd->bl, CLR_DEAD);
-			break;
+			continue;
 		}
 
 		if (fitem == NULL || fitem->bl.m != sd->bl.m)
@@ -10630,13 +10630,13 @@ void clif_parse_TakeItem(int fd, struct map_session_data *sd)
 				 sd->sc.data[SC_SUHIDE] ||
 				 pc_ismuted(&sd->sc, MANNER_NOITEM)
 			) )
-			break;
+			continue;
 
 		if (pc_cant_act(sd))
-			break;
+			continue;
 
 		if (!pc->takeitem(sd, fitem))
-			break;
+			continue;
 
 		return;
 	} while (0);
@@ -17894,7 +17894,8 @@ void clif_monster_hp_bar(struct mob_data *md, struct map_session_data *sd)
 }
 
 /* [Ind/Hercules] placeholder for unsupported incoming packets (avoids server disconnecting client) */
-void __attribute__ ((unused)) clif_parse_dull(int fd,struct map_session_data *sd) {
+void clif_parse_dull(int fd,struct map_session_data *sd)
+{
 	return;
 }
 
@@ -20068,7 +20069,7 @@ const struct s_packet_db *clif_packet(int packet_id)
 	return &packet_db[packet_id];
 }
 
-static void __attribute__ ((unused)) packetdb_addpacket(short cmd, int len, ...) {
+static void packetdb_addpacket(short cmd, int len, ...) {
 	va_list va;
 	int i;
 	int pos;

@@ -538,7 +538,7 @@ EOF
 			next if $fileguards{$key}->{private};
 			print FH <<"EOF";
 #ifdef $fileguards{$key}->{guard} /* $key */
-	if ((server_type&($fileguards{$key}->{type})) != 0 && !HPM_SYMBOL("$exportsymbols{$key}", $key))
+	if ((server_type & ($fileguards{$key}->{type})) != 0 && HPM_SYMBOL("$exportsymbols{$key}", $key) == NULL)
 		return "$exportsymbols{$key}";
 #endif // $fileguards{$key}->{guard}
 EOF

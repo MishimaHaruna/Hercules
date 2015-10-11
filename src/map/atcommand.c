@@ -8364,17 +8364,14 @@ void atcommand_commands_sub(struct map_session_data* sd, const int fd, AtCommand
 	for (cmd = dbi_first(iter); dbi_exists(iter); cmd = dbi_next(iter)) {
 		size_t slen;
 
-		switch( type ) {
-			case COMMAND_CHARCOMMAND:
-				if( cmd->char_groups[pcg->get_idx(sd->group)] == 0 )
-					continue;
-				break;
-			case COMMAND_ATCOMMAND:
-				if( cmd->at_groups[pcg->get_idx(sd->group)] == 0 )
-					continue;
-				break;
-			default:
+		if (type == COMMAND_CHARCOMMAND) {
+			if (cmd->char_groups[pcg->get_idx(sd->group)] == 0)
 				continue;
+		} else if (type == COMMAND_ATCOMMAND) {
+			if (cmd->at_groups[pcg->get_idx(sd->group)] == 0)
+				continue;
+		} else {
+			continue;
 		}
 
 		slen = strlen(cmd->command);

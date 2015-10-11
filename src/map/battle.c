@@ -5118,6 +5118,14 @@ struct Damage battle_calc_weapon_attack(struct block_list *src,struct block_list
 			case MO_EXTREMITYFIST:
 				ATK_ADD(250 + 150*skill_lv);
 				break;
+
+			case GS_MAGICALBULLET:
+				ATK_ADD(status->get_matk(src, 2));
+				break;
+
+			case NJ_SYURIKEN:
+				ATK_ADD(4*skill_lv);
+				break;
 #endif
 			case TK_DOWNKICK:
 			case TK_STORMKICK:
@@ -5129,14 +5137,6 @@ struct Damage battle_calc_weapon_attack(struct block_list *src,struct block_list
 					ATK_ADD(10*pc->checkskill(sd, TK_RUN));
 				break;
 
-#ifndef RENEWAL
-			case GS_MAGICALBULLET:
-				ATK_ADD( status->get_matk(src, 2) );
-				break;
-			case NJ_SYURIKEN:
-				ATK_ADD(4*skill_lv);
-#endif
-				break;
 			case GC_COUNTERSLASH:
 				ATK_ADD( status_get_agi(src) * 2 + (sd?sd->status.job_level:0) * 4 );
 				break;
