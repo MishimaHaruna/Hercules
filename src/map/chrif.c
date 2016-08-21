@@ -44,6 +44,7 @@
 #include "common/ers.h"
 #include "common/memmgr.h"
 #include "common/nullpo.h"
+#include "common/random.h"
 #include "common/showmsg.h"
 #include "common/socket.h"
 #include "common/strlib.h"
@@ -433,7 +434,7 @@ bool chrif_changemapserverack(int account_id, int login_id1, int login_id2, int 
 	if ( !( node = chrif->auth_check(account_id, char_id, ST_MAPCHANGE) ) )
 		return false;
 
-	if ( !login_id1 ) {
+	if (login_id1 == 0) {
 		ShowError("chrif_changemapserverack: map server change failed.\n");
 		clif->authfail_fd(node->fd, 0); // Disconnected from server
 	} else
@@ -442,7 +443,9 @@ bool chrif_changemapserverack(int account_id, int login_id1, int login_id2, int 
 	//Player has been saved already, remove him from memory. [Skotlex]
 	chrif->auth_delete(account_id, char_id, ST_MAPCHANGE);
 
-	return (!login_id1)?false:true; // Is this the best approach here?
+	if (login_id1 == 0)
+		return false;
+	return true;
 }
 
 /*==========================================
@@ -598,7 +601,7 @@ void chrif_authreq(struct map_session_data *sd, bool hstandalone) {
  *------------------------------------------*/
 void chrif_authok(int fd) {
 	int account_id, group_id, char_id;
-	uint32 login_id1,login_id2;
+	int login_id1, login_id2;
 	time_t expiration_time;
 	const struct mmo_charstatus *charstatus;
 	struct auth_node *node;
@@ -660,7 +663,7 @@ void chrif_authok(int fd) {
 // client authentication failed
 void chrif_authfail(int fd) {/* HELLO WORLD. ip in RFIFOL 15 is not being used (but is available) */
 	int account_id, char_id;
-	uint32 login_id1;
+	int login_id1;
 	char sex;
 	struct auth_node* node;
 
@@ -724,7 +727,7 @@ int auth_db_cleanup(int tid, int64 tick, int id, intptr_t data) {
 bool chrif_charselectreq(struct map_session_data* sd, uint32 s_ip) {
 	nullpo_ret(sd);
 
-	if( !sd->bl.id || !sd->login_id1 )
+	if (!sd->bl.id || sd->login_id1 == 0)
 		return false;
 
 	chrif_check(false);
@@ -996,7 +999,7 @@ void chrif_idbanned(int fd) {
 		return;
 	}
 
-	sd->login_id1++; // change identify, because if player come back in char within the 5 seconds, he can change its characters
+	sd->login_id1 = rnd(); // change identify, because if player come back in char within the 5 seconds, he can change its characters
 	if (RFIFOB(fd,6) == 0) { // 0: change of status
 		int ret_status = RFIFOL(fd,7); // status or final date of a banishment
 		if(0<ret_status && ret_status<=9)

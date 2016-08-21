@@ -274,7 +274,7 @@ uint32 login_lan_subnet_check(uint32 ip)
 	return sockt->lan_subnet_check(ip, NULL);
 }
 
-void login_fromchar_auth_ack(int fd, int account_id, uint32 login_id1, uint32 login_id2, uint8 sex, int request_id, struct login_auth_node* node)
+void login_fromchar_auth_ack(int fd, int account_id, int login_id1, int login_id2, uint8 sex, int request_id, struct login_auth_node *node)
 {
 	WFIFOHEAD(fd,33);
 	WFIFOW(fd,0) = 0x2713;
@@ -308,8 +308,8 @@ void login_fromchar_parse_auth(int fd, int id, const char *const ip)
 	struct login_auth_node* node;
 
 	int account_id = RFIFOL(fd,2);
-	uint32 login_id1 = RFIFOL(fd,6);
-	uint32 login_id2 = RFIFOL(fd,10);
+	int login_id1 = RFIFOL(fd,6);
+	int login_id2 = RFIFOL(fd,10);
 	uint8 sex = RFIFOB(fd,14);
 	//uint32 ip_ = ntohl(RFIFOL(fd,15));
 	int request_id = RFIFOL(fd,19);

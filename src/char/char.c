@@ -2280,8 +2280,8 @@ void char_parse_fromlogin_auth_state(int fd)
 {
 	struct char_session_data* sd = NULL;
 	int account_id = RFIFOL(fd,2);
-	uint32 login_id1 = RFIFOL(fd,6);
-	uint32 login_id2 = RFIFOL(fd,10);
+	int login_id1 = RFIFOL(fd,6);
+	int login_id2 = RFIFOL(fd,10);
 	uint8 sex = RFIFOB(fd,14);
 	uint8 result = RFIFOB(fd,15);
 	int request_id = RFIFOL(fd,16);
@@ -3211,8 +3211,8 @@ void char_select_ack(int fd, int account_id, uint8 flag)
 void char_parse_frommap_char_select_req(int fd)
 {
 	int account_id = RFIFOL(fd,2);
-	uint32 login_id1 = RFIFOL(fd,6);
-	uint32 login_id2 = RFIFOL(fd,10);
+	int login_id1 = RFIFOL(fd,6);
+	int login_id2 = RFIFOL(fd,10);
 	uint32 ip = RFIFOL(fd,14);
 	int32 group_id = RFIFOL(fd, 18);
 	RFIFOSKIP(fd,22);
@@ -4404,14 +4404,14 @@ void char_send_account_id(int fd, int account_id)
 void char_parse_char_connect(int fd, struct char_session_data* sd, uint32 ipl)
 {
 	int account_id = RFIFOL(fd,2);
-	uint32 login_id1 = RFIFOL(fd,6);
-	uint32 login_id2 = RFIFOL(fd,10);
+	int login_id1 = RFIFOL(fd,6);
+	int login_id2 = RFIFOL(fd,10);
 	int sex = RFIFOB(fd,16);
 	struct char_auth_node* node;
 
 	RFIFOSKIP(fd,17);
 
-	ShowInfo("request connect - account_id:%d/login_id1:%u/login_id2:%u\n", account_id, login_id1, login_id2);
+	ShowInfo("request connect - account_id:%d/login_id1:%d/login_id2:%d\n", account_id, login_id1, login_id2);
 
 	if (sd) {
 		//Received again auth packet for already authenticated account?? Discard it.
