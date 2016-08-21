@@ -157,7 +157,7 @@ void mapif_parse_PartyInfo(int fd, int party_id, int char_id);
 int mapif_parse_PartyAddMember(int fd, int party_id, const struct party_member *member);
 int mapif_parse_PartyChangeOption(int fd,int party_id,int account_id,int exp,int item);
 int mapif_parse_PartyLeave(int fd, int party_id, int account_id, int char_id);
-int mapif_parse_PartyChangeMap(int fd, int party_id, int account_id, int char_id, unsigned short map, int online, unsigned int lv);
+int mapif_parse_PartyChangeMap(int fd, int party_id, int account_id, int char_id, unsigned short map, int online, int lv);
 int mapif_parse_BreakParty(int fd, int party_id);
 int mapif_parse_PartyMessage(int fd, int party_id, int account_id, const char *mes, int len);
 int mapif_parse_PartyLeaderChange(int fd, int party_id, int account_id, int char_id);

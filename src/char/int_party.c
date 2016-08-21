@@ -43,11 +43,12 @@ struct inter_party_interface inter_party_s;
 struct inter_party_interface *inter_party;
 
 //Updates party's level range and unsets even share if broken.
-static int inter_party_check_lv(struct party_data *p) {
+static int inter_party_check_lv(struct party_data *p)
+{
 	int i;
-	unsigned int lv;
+	int lv;
 	nullpo_ret(p);
-	p->min_lv = UINT_MAX;
+	p->min_lv = INT_MAX;
 	p->max_lv = 0;
 	for(i=0;i<MAX_PARTY;i++){
 		/**
@@ -56,9 +57,11 @@ static int inter_party_check_lv(struct party_data *p) {
 		if(!p->party.member[i].online || p->party.member[i].char_id == p->family )
 			continue;
 
-		lv=p->party.member[i].lv;
-		if (lv < p->min_lv) p->min_lv = lv;
-		if (lv > p->max_lv) p->max_lv = lv;
+		lv = p->party.member[i].lv;
+		if (lv < p->min_lv)
+			p->min_lv = lv;
+		if (lv > p->max_lv)
+			p->max_lv = lv;
 	}
 
 	if (p->party.exp && !inter_party->check_exp_share(p)) {
@@ -73,15 +76,16 @@ static void inter_party_calc_state(struct party_data *p)
 {
 	int i;
 	nullpo_retv(p);
-	p->min_lv = UINT_MAX;
+	p->min_lv = INT_MAX;
 	p->max_lv = 0;
-	p->party.count =
-	p->size =
+	p->party.count = 0;
+	p->size = 0;
 	p->family = 0;
 
 	//Check party size
 	for(i=0;i<MAX_PARTY;i++){
-		if (!p->party.member[i].lv) continue;
+		if (p->party.member[i].lv == 0)
+			continue;
 		p->size++;
 		if(p->party.member[i].online)
 			p->party.count++;
@@ -103,13 +107,15 @@ static void inter_party_calc_state(struct party_data *p)
 	}
 	//max/min levels.
 	for (i = 0; i < MAX_PARTY; i++) {
-		unsigned int lv = p->party.member[i].lv;
+		int lv = p->party.member[i].lv;
 		if (!lv) continue;
 		if (p->party.member[i].online
 		 && p->party.member[i].char_id != p->family /* In families, the kid is not counted towards exp share rules. */
 		) {
-			if( lv < p->min_lv ) p->min_lv=lv;
-			if( p->max_lv < lv ) p->max_lv=lv;
+			if (lv < p->min_lv)
+				p->min_lv = lv;
+			if (p->max_lv < lv)
+				p->max_lv = lv;
 		}
 	}
 
@@ -651,7 +657,7 @@ int mapif_parse_PartyLeave(int fd, int party_id, int account_id, int char_id)
 	return 0;
 }
 // When member goes to other map or levels up.
-int mapif_parse_PartyChangeMap(int fd, int party_id, int account_id, int char_id, unsigned short map, int online, unsigned int lv)
+int mapif_parse_PartyChangeMap(int fd, int party_id, int account_id, int char_id, unsigned short map, int online, int lv)
 {
 	struct party_data *p;
 	int i;

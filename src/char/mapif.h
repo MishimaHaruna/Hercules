@@ -150,7 +150,7 @@ struct mapif_interface {
 	int (*parse_PartyAddMember) (int fd, int party_id, const struct party_member *member);
 	int (*parse_PartyChangeOption) (int fd,int party_id,int account_id,int exp,int item);
 	int (*parse_PartyLeave) (int fd, int party_id, int account_id, int char_id);
-	int (*parse_PartyChangeMap) (int fd, int party_id, int account_id, int char_id, unsigned short map, int online, unsigned int lv);
+	int (*parse_PartyChangeMap) (int fd, int party_id, int account_id, int char_id, unsigned short map, int online, int lv);
 	int (*parse_BreakParty) (int fd, int party_id);
 	int (*parse_PartyMessage) (int fd, int party_id, int account_id, const char *mes, int len);
 	int (*parse_PartyLeaderChange) (int fd, int party_id, int account_id, int char_id);

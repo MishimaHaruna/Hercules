@@ -39,7 +39,7 @@ enum {
 
 struct party_data {
 	struct party party;
-	unsigned int min_lv, max_lv;
+	int min_lv, max_lv;
 	int family; //Is this party a family? if so, this holds the child id.
 	unsigned char size; //Total size of party.
 };
