@@ -4115,22 +4115,42 @@ bool map_config_read(const char *filename, bool imported)
 	return retval;
 }
 
+void map_npclist_sub(const char *filename)
+{
+	char *dirname = aStrdup(filename);
+	int lastsep = 0, i = 0;
+
+	for (i = 0; dirname[i] != '\0'; i++) {
+		if (dirname[i] == '\\')
+			dirname[i] = '/';
+		if (dirname[i] == '/')
+			lastsep = i;
+	}
+	dirname[lastsep] = '\0';
+
+	map->read_npclist(filename, dirname, false);
+
+	aFree(dirname);
+}
+
 /**
  * Reads 'npc_global_list'/'npc_removed_list' and adds or removes NPC sources
  * from map-server.
  *
- * @param filename Path to configuration file (used in error and warning messages).
- * @param imported Whether the current config is imported from another file.
+ * @param filename       Path to configuration file (used in error and warning messages).
+ * @param submodule_path If the file is a submodule, the base path prefix (NULL if not a submodule).
+ * @param imported       Whether the current config is imported from another file.
  *
  * @retval false in case of error.
  */
-bool map_read_npclist(const char *filename, bool imported)
+bool map_read_npclist(const char *filename, const char *submodule_path, bool imported)
 {
 	struct config_t config;
 	struct config_setting_t *setting = NULL;
 	const char *import = NULL;
 	bool retval = true;
 	bool remove_all = false;
+	VECTOR_DECL(char) rebased_scriptname;
 
 	struct DBMap *deleted_npcs;
 
@@ -4139,6 +4159,13 @@ bool map_read_npclist(const char *filename, bool imported)
 	if (!libconfig->load_file(&config, filename))
 		return false;
 
+	VECTOR_INIT(rebased_scriptname);
+	if (submodule_path != NULL) {
+		VECTOR_ENSURE(rebased_scriptname, (int)strlen(submodule_path) + 1, 1);
+		VECTOR_PUSHARRAY(rebased_scriptname, submodule_path, strlen(submodule_path));
+		VECTOR_PUSH(rebased_scriptname, '/');
+	}
+
 	deleted_npcs = strdb_alloc(DB_OPT_DUP_KEY|DB_OPT_ALLOW_NULL_DATA, 0);
 
 	// Remove NPCs
@@ -4146,6 +4173,7 @@ bool map_read_npclist(const char *filename, bool imported)
 		int i, del_count = libconfig->setting_length(setting);
 		for (i = 0; i < del_count; i++) {
 			const char *scriptname;
+			int scriptname_len = 0;
 
 			if ((scriptname = libconfig->setting_get_string_elem(setting, i)) == NULL || scriptname[0] == '\0')
 				continue;
@@ -4154,8 +4182,18 @@ bool map_read_npclist(const char *filename, bool imported)
 				remove_all = true;
 				npc->clearsrcfile();
 			} else {
+				if (submodule_path != NULL) {
+					scriptname_len = (int)strlen(scriptname) + 1;
+					VECTOR_ENSURE(rebased_scriptname, scriptname_len, 1);
+					VECTOR_PUSHARRAY(rebased_scriptname, scriptname, strlen(scriptname));
+					VECTOR_PUSH(rebased_scriptname, '\0');
+					scriptname = VECTOR_DATA(rebased_scriptname);
+				}
 				strdb_put(deleted_npcs, scriptname, NULL);
 				npc->delsrcfile(scriptname);
+				if (submodule_path != NULL) {
+					(void)VECTOR_POPN(rebased_scriptname, scriptname_len);
+				}
 			}
 		}
 	}
@@ -4163,21 +4201,36 @@ bool map_read_npclist(const char *filename, bool imported)
 	if ((setting = libconfig->lookup(&config, "npc_global_list")) != NULL) {
 		int i, count = libconfig->setting_length(setting);
 		if (count <= 0) {
-			if (!imported) {
+			if (!imported && submodule_path != NULL) {
 				ShowWarning("map_read_npclist: no NPCs found in %s!\n", filename);
 				retval = false;
 			}
 		}
 		for (i = 0; i < count; i++) {
 			const char *scriptname;
+			int scriptname_len = 0;
 
 			if ((scriptname = libconfig->setting_get_string_elem(setting, i)) == NULL || scriptname[0] == '\0')
 				continue;
 
-			if (remove_all || strdb_exists(deleted_npcs, scriptname))
+			if (remove_all)
+				continue;
+
+			if (submodule_path != NULL) {
+				scriptname_len = (int)strlen(scriptname) + 1;
+				VECTOR_ENSURE(rebased_scriptname, scriptname_len, 1);
+				VECTOR_PUSHARRAY(rebased_scriptname, scriptname, strlen(scriptname));
+				VECTOR_PUSH(rebased_scriptname, '\0');
+				scriptname = VECTOR_DATA(rebased_scriptname);
+			}
+
+			if (strdb_exists(deleted_npcs, scriptname))
 				continue;
 
 			npc->addsrcfile(scriptname);
+			if (submodule_path != NULL) {
+				(void)VECTOR_POPN(rebased_scriptname, scriptname_len);
+			}
 		}
 	} else {
 		ShowError("map_read_npclist: npc_global_list was not found in %s!\n", filename);
@@ -4187,7 +4240,7 @@ bool map_read_npclist(const char *filename, bool imported)
 	db_destroy(deleted_npcs);
 
 	// import should overwrite any previous configuration, so it should be called last
-	if (libconfig->lookup_string(&config, "import", &import) == CONFIG_TRUE) {
+	if (submodule_path != NULL && libconfig->lookup_string(&config, "import", &import) == CONFIG_TRUE) {
 		const char *base_npclist = NULL;
 #ifdef RENEWAL
 		base_npclist = "npc/re/scripts_main.conf";
@@ -4197,12 +4250,18 @@ bool map_read_npclist(const char *filename, bool imported)
 		if (strcmp(import, filename) == 0 || strcmp(import, base_npclist) == 0) {
 			ShowWarning("map_read_npclist: Loop detected! Skipping 'import'...\n");
 		} else {
-			if (!map->read_npclist(import, true))
+			if (!map->read_npclist(import, NULL, true))
 				retval = false;
 		}
 	}
 
 	libconfig->destroy(&config);
+
+	if (!imported && submodule_path == NULL) {
+		findfile("npc", "loadscripts.conf", map_npclist_sub);
+	}
+
+	VECTOR_CLEAR(rebased_scriptname);
 	return retval;
 }
 
@@ -4217,9 +4276,9 @@ void map_reloadnpc(bool clear) {
 		npc->clearsrcfile();
 
 #ifdef RENEWAL
-	map->read_npclist("npc/re/scripts_main.conf", false);
+	map->read_npclist("npc/re/scripts_main.conf", NULL, false);
 #else
-	map->read_npclist("npc/pre-re/scripts_main.conf", false);
+	map->read_npclist("npc/pre-re/scripts_main.conf", NULL, false);
 #endif
 
 	// Append extra scripts
