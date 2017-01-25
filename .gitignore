@@ -31,6 +31,9 @@ Thumbs.db
 /core
 /ipch
 /login-server
+/CMakeCache.txt
+/CMakeFiles
+/cmake_install.cmake
 /Makefile
 /Makefile.cache
 /map-server
@@ -48,11 +51,17 @@ Thumbs.db
 /Hercules.xcodeproj/project.xcworkspace/xcshareddata/Hercules.xccheckout
 
 # /3rdparty/libconfig/
+/3rdparty/libconfig/CMakeFiles
+/3rdparty/libconfig/cmake_install.cmake
 /3rdparty/libconfig/Makefile
+/3rdparty/libconfig/*.a
 /3rdparty/libconfig/*.o
 
 # /3rdparty/mt19937ar/
+/3rdparty/mt19937ar/CMakeFiles
+/3rdparty/mt19937ar/cmake_install.cmake
 /3rdparty/mt19937ar/Makefile
+/3rdparty/mt19937ar/*.a
 /3rdparty/mt19937ar/*.o
 
 # /cache/
@@ -71,12 +80,18 @@ Thumbs.db
 /src/char/obj_sql
 
 # /src/common/
+/src/common/CMakeFiles
+/src/common/cmake_install.cmake
 /src/common/Makefile
+/src/common/obj_all
 /src/common/obj_all
 /src/common/obj_sql
 /src/common/sysinfo.inc
+/src/common/*.a
 
 # /src/login/
+/src/login/CMakeFiles
+/src/login/cmake_install.cmake
 /src/login/Makefile
 /src/login/obj_sql
 

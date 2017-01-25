@@ -1,0 +1,45 @@
+/**
+ * This file is part of Hercules.
+ * http://herc.ws - http://github.com/HerculesWS/Hercules
+ *
+ * Copyright (C) 2014-@YEAR@  Hercules Dev Team
+ *
+ * Hercules is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+// This file was automatically generated. Any edit to it will be lost.
+
+// Platform (uname -s)
+#define SYSINFO_PLATFORM "@SYSINFO_PLATFORM@"
+
+// Operating System version (Platform-dependent)
+#define SYSINFO_OSVERSION "@SYSINFO_OSVERSION@"
+
+// CPU Model (Platform-dependent)
+#define SYSINFO_CPU "@SYSINFO_CPU@"
+
+// CPU Cores (Platform-dependent)
+#define SYSINFO_CPUCORES "@SYSINFO_CORES@"
+
+// OS Architecture (uname -m)
+#define SYSINFO_ARCH "@SYSINFO_ARCH@"
+
+// Compiler Flags
+#define SYSINFO_CFLAGS "@SYSINFO_CFLAGS@"
+
+// VCS Type
+#define SYSINFO_VCSTYPE @SYSINFO_VCSTYPE@
+
+// VCS Revision
+#define SYSINFO_VCSREV "@SYSINFO_VCSREV@"

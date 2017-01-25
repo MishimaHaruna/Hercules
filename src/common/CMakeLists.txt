@@ -1,0 +1,268 @@
+PROJECT(common)
+
+#FILE(GLOB HEADER_FILES *.h)
+#FILE(GLOB SOURCE_FILES *.c)
+SET(COMMON_SHARED_C
+	conf.c
+	db.c
+	des.c
+	ers.c
+	grfio.c
+	HPM.c
+	mapindex.c
+	md5calc.c
+	mutex.c
+	nullpo.c
+	random.c
+	showmsg.c
+	strlib.c
+	sysinfo.c
+	thread.c
+	timer.c
+	utils.c
+	)
+SET(COMMON_C
+	console.c
+	core.c
+	memmgr.c
+	socket.c
+	sql.c
+	)
+SET(COMMON_MINI_C
+	console.c
+	core.c
+	memmgr.c
+	socket.c
+	)
+
+ADD_LIBRARY(herculescore STATIC
+	${COMMON_SHARED_C}
+	${COMMON_C}
+	$<TARGET_OBJECTS:config>
+	)
+
+ADD_LIBRARY(herculesminicore STATIC
+	${COMMON_SHARED_C}
+	${COMMON_MINI_C}
+	$<TARGET_OBJECTS:config>
+	)
+
+TARGET_LINK_LIBRARIES(herculescore mt19937ar ${MYSQL_LIBRARIES} ${ZLIB_LIBRARIES})
+TARGET_LINK_LIBRARIES(herculesminicore STATIC mt19937ar)
+
+SET(SYSINFO_PLATFORM ${CMAKE_SYSTEM_NAME})
+SET(SYSINFO_OSVERSION "Unknown")
+SET(SYSINFO_CPU "Unknown")
+SET(SYSINFO_CORES "0")
+SET(SYSINFO_VCSTYPE "VCSTYPE_NONE")
+SET(SYSINFO_VCSREV "Unknown")
+
+IF(UNIX OR CYGWIN)
+	FIND_PROGRAM(CMD_UNAME "uname")
+	IF(CMD_UNAME)
+		EXECUTE_PROCESS(COMMAND ${CMD_UNAME} "-m" OUTPUT_VARIABLE SYSINFO_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
+	ENDIF(CMD_UNAME)
+#ELSE()
+ENDIF(UNIX OR CYGWIN)
+STRING(STRIP ${SYSINFO_ARCH} SYSINFO_ARCH)
+
+IF (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+	FIND_PROGRAM(CMD_LSB_RELEASE "lsb_release")
+	IF(CMD_LSB_RELEASE)
+		EXECUTE_PROCESS(COMMAND ${CMD_LSB_RELEASE} "-i" OUTPUT_VARIABLE _lsb_dist OUTPUT_STRIP_TRAILING_WHITESPACE)
+		STRING(REGEX REPLACE "Distributor ID:\t" "" _lsb_dist ${_lsb_dist})
+		EXECUTE_PROCESS(COMMAND ${CMD_LSB_RELEASE} "-d" OUTPUT_VARIABLE _lsb_desc OUTPUT_STRIP_TRAILING_WHITESPACE)
+		STRING(REGEX REPLACE "Description:\t" "" _lsb_desc ${_lsb_desc})
+		STRING(REGEX REPLACE "Enterprise Linux Enterprise Linux" "Oracle Linux" _lsb_desc ${_lsb_desc})
+	ENDIF(LSB_RELEASE)
+
+	IF(_lsb_dist MATCHES "NAME=Gentoo" OR _lsb_dist STREQUAL "Gentoo")
+		SET(_lsb_dist "Gentoo")
+		FILE(STRINGS "/etc/gentoo-release" _lsb_desc LIMIT_COUNT 1 NO_HEX_CONVERSION)
+	ENDIF(_lsb_dist MATCHES "NAME=Gentoo" OR _lsb_dist STREQUAL "Gentoo")
+
+	IF(NOT _lsb_dist)
+		IF(EXISTS "/etc/arch-release")
+			# empty release file
+			SET(_lsb_dist "ArchLinux")
+			SET(_lsb_desc "")
+		ELSEIF(EXISTS "/etc/vmware-release")
+			# "VMware ESX Server 3" or "VMware ESX 4.0 (Kandinsky)"
+			SET(_lsb_dist "VMWare")
+			FILE(STRINGS "/etc/vmware-release" _lsb_desc LIMIT_COUNT 1 NO_HEX_CONVERSION)
+		ELSEIF(EXISTS "/etc/debian_version")
+			# "wheezy/sid"
+			SET(_lsb_dist "Debian")
+			FILE(STRINGS "/etc/debian_version" _lsb_desc LIMIT_COUNT 1 NO_HEX_CONVERSION)
+			SET(_lsb_desc "Debian GNU/Linux ${_lsb_desc}")
+		ELSEIF(EXISTS "/etc/fedora-release")
+			# "Fedora release 9 (Sulphur)"
+			SET(_lsb_dist "Fedora")
+			FILE(STRINGS "/etc/fedora-release" _lsb_desc LIMIT_COUNT 1 NO_HEX_CONVERSION)
+		ELSEIF(EXISTS "/etc/knoppix_version")
+			# "3.2 2003-04-15"
+			SET(_lsb_dist "Knoppix")
+			FILE(STRINGS "/etc/knoppix_version" _lsb_desc LIMIT_COUNT 1 NO_HEX_CONVERSION)
+			SET(_lsb_desc "Knoppix GNU/Linux ${_lsb_desc}")
+		ELSEIF(EXISTS "/etc/mandriva-release")
+			# "Mandriva Linux release 2010.1 (Official) for x86_64"
+			SET(_lsb_dist "Mandriva")
+			FILE(STRINGS "/etc/mandriva-release" _lsb_desc LIMIT_COUNT 1 NO_HEX_CONVERSION)
+		ELSEIF(EXISTS "/etc/mandrake-release")
+			# "Mandrakelinux release 10.1 (Community) for i586"
+			SET(_lsb_dist "Mandrake")
+			FILE(STRINGS "/etc/mandrake-release" _lsb_desc LIMIT_COUNT 1 NO_HEX_CONVERSION)
+		ELSEIF(EXISTS "/etc/oracle-release")
+			# "Oracle Linux Server release 6.3"
+			SET(_lsb_dist "Oracle")
+			FILE(STRINGS "/etc/oracle-release" _lsb_desc LIMIT_COUNT 1 NO_HEX_CONVERSION)
+		ELSEIF(EXISTS "/etc/centos-release")
+			# "CentOS Linux release 6.0 (Final)"
+			SET(_lsb_dist "CentOS")
+			FILE(STRINGS "/etc/centos-release" _lsb_desc LIMIT_COUNT 1 NO_HEX_CONVERSION)
+		ELSEIF(EXISTS "/etc/redhat-release")
+			# "Red Hat Enterprise Linux Server release 5 (Tikanga)"
+			SET(_lsb_dist "RedHat")
+			FILE(STRINGS "/etc/redhat-release" _lsb_desc LIMIT_COUNT 1 NO_HEX_CONVERSION)
+		ELSEIF(EXISTS "/etc/slackware-version")
+			SET(_lsb_dist "Slackware")
+			FILE(STRINGS "/etc/slackware-version" _lsb_desc LIMIT_COUNT 1 NO_HEX_CONVERSION)
+		ELSEIF(EXISTS "/etc/slackware-release")
+			SET(_lsb_dist "Slackware")
+			FILE(STRINGS "/etc/slackware-release" _lsb_desc LIMIT_COUNT 1 NO_HEX_CONVERSION)
+		ELSEIF(EXISTS "/etc/SuSE-release")
+			# "SUSE Linux Enterprise Server 11 (x86_64)"
+			# Note: it may contain several extra lines
+			SET(_lsb_dist "SuSE")
+			FILE(STRINGS "/etc/SuSE-release" _lsb_desc LIMIT_COUNT 1 NO_HEX_CONVERSION)
+		ELSEIF(EXISTS "/etc/trustix-release")
+			# "Trustix Secure Linux release 2.0 (Cloud)"
+			SET(_lsb_dist "Trustix")
+			FILE(STRINGS "/etc/trustix-release" _lsb_desc LIMIT_COUNT 1 NO_HEX_CONVERSION)
+		ELSE()
+			SET(_lsb_dist "Unknown")
+			SET(_lsb_desc "")
+		ENDIF()
+	ENDIF(NOT _lsb_dist)
+
+	IF(_lsb_desc)
+		SET(SYSINFO_OSVERSION ${_lsb_desc})
+	ELSE(_lsb_desc)
+		SET(SYSINFO_OSVERSION ${_lsb_dist})
+	ENDIF(_lsb_desc)
+
+	FILE(STRINGS "/proc/cpuinfo" SYSINFO_CPU REGEX "model name.*:" LIMIT_COUNT 1)
+	STRING(REGEX REPLACE "^.*:" "" SYSINFO_CPU ${SYSINFO_CPU})
+	STRING(STRIP ${SYSINFO_CPU} SYSINFO_CPU)
+	FILE(STRINGS "/proc/cpuinfo" SYSINFO_CORES REGEX "^processor.: [0-9]+$")
+	LIST(LENGTH SYSINFO_CORES SYSINFO_CORES)
+ELSEIF(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+	SET(SYSINFO_PLATFORM "Mac OS X")
+
+	FIND_PROGRAM(CMD_SW_VERS "sw_vers")
+	IF(CMD_SW_VERS)
+		EXECUTE_PROCESS(COMMAND ${CMD_SW_VERS} "-productName" OUTPUT_VARIABLE _product_name OUTPUT_STRIP_TRAILING_WHITESPACE)
+		EXECUTE_PROCESS(COMMAND ${CMD_SW_VERS} "-productVersion" OUTPUT_VARIABLE _product_version OUTPUT_STRIP_TRAILING_WHITESPACE)
+		EXECUTE_PROCESS(COMMAND ${CMD_SW_VERS} "-buildVersion" OUTPUT_VARIABLE _build_version OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+		SET(SYSINFO_OSVERSION "${_product_name} ${_product_version} ${_build_version}")
+	ENDIF(CMD_SW_VERS)
+
+	FIND_PROGRAM(CMD_SYS_PROFILER "system_profiler")
+	FIND_PROGRAM(CMD_GREP "grep")
+	IF(CMD_SYS_PROFILER AND CMD_GREP)
+		EXECUTE_PROCESS(COMMAND ${CMD_SYS_PROFILER} "SPHardwareDataType"
+			COMMAND ${CMD_GREP} "Processor Name:"
+			OUTPUT_VARIABLE _hwdata_cpu
+			OUTPUT_STRIP_TRAILING_WHITESPACE)
+		STRING(REGEX REPLACE "^.*Processor Name: *(.+) *$" "\\1" _hwdata_cpu "${_hwdata_cpu}")
+		EXECUTE_PROCESS(COMMAND ${CMD_SYS_PROFILER} "SPHardwareDataType"
+			COMMAND ${CMD_GREP} "Processor Speed:"
+			OUTPUT_VARIABLE _hwdata_cpuspeed
+			OUTPUT_STRIP_TRAILING_WHITESPACE)
+		STRING(REGEX REPLACE "^.*Processor Speed: *(.+) *$" "\\1" _hwdata_cpuspeed "${_hwdata_cpuspeed}")
+		SET(SYSINFO_CPU "${_hwdata_cpu} (${_hwdata_cpuspeed})")
+		EXECUTE_PROCESS(COMMAND ${CMD_SYS_PROFILER} "SPHardwareDataType"
+			COMMAND ${CMD_GREP} "Total Number of Cores:"
+			OUTPUT_VARIABLE SYSINFO_CORES
+			OUTPUT_STRIP_TRAILING_WHITESPACE)
+		STRING(REGEX REPLACE "^.*Total Number of Cores: *([0-9]+) *$" "\\1" SYSINFO_CORES "${SYSINFO_CORES}")
+	ENDIF(CMD_SYS_PROFILER AND CMD_GREP)
+ELSEIF(CMAKE_SYSTEM_NAME STREQUAL "SunOS")
+	SET(SYSINFO_PLATFORM "Solaris")
+	IF(CMD_UNAME)
+		EXECUTE_PROCESS(COMMAND ${CMD_UNAME} "-v" OUTPUT_VARIABLE _uname_v OUTPUT_STRIP_TRAILING_WHITESPACE)
+		SET(SYSINFO_OSVERSION "${SYSINFO_PLATFORM} ${CMAKE_SYSTEM_VERSION} (${CMAKE_SYSTEM_PROCESSOR} ${_uname_v})")
+	ENDIF(CMD_UNAME)
+ELSEIF (CMAKE_SYSTEM_NAME STREQUAL "AIX")
+	FIND_PROGRAM(CMD_OSLEVEL "oslevel")
+	IF(CMD_OSLEVEL)
+		EXECUTE_PROCESS(COMMAND ${CMD_OSLEVEL} OUTPUT_VARIABLE _oslevel_1 OUTPUT_STRIP_TRAILING_WHITESPACE)
+		EXECUTE_PROCESS(COMMAND ${CMD_OSLEVEL} "-r" OUTPUT_VARIABLE _oslevel_r OUTPUT_STRIP_TRAILING_WHITESPACE)
+		SET(SYSINFO_OSVERSION "AIX ${_oslevel_1} (${_oslevel_r})")
+	ENDIF(CMD_OSLEVEL)
+ELSEIF (CYGWIN)
+	SET(SYSNIFO_PLATFORM "Cygwin Windows")
+	SET(SYSINFO_OSVERSION ${CMAKE_SYSTEM_NAME}) # TODO: Check that this is equal to uname -s
+	FILE(STRINGS "/proc/cpuinfo" SYSINFO_CPU REGEX "model name.*:" LIMIT_COUNT 1)
+	STRING(REGEX REPLACE "^.*:" "" SYSINFO_CPU ${SYSINFO_CPU})
+	STRING(STRIP ${SYSINFO_CPU} SYSINFO_CPU)
+	FILE(STRINGS "/proc/cpuinfo" SYSINFO_CORES REGEX "^processor.: [0-9]+$")
+	LIST(LENGTH SYSINFO_CORES SYSINFO_CORES)
+ELSEIF (CMAKE_SYSTEM_NAME STREQUAL "OpenBSD")
+	IF(CMD_UNAME)
+		EXECUTE_PROCESS(COMMAND ${CMD_UNAME} "-v" OUTPUT_VARIABLE _uname_v OUTPUT_STRIP_TRAILING_WHITESPACE)
+		SET(SYSINFO_OSVERSION "${SYSINFO_PLATFORM} ${CMAKE_SYSTEM_VERSION} (${CMAKE_SYSTEM_PROCESSOR} ${_uname_v})")
+	ENDIF(CMD_UNAME)
+	FIND_PROGRAM(CMD_SYSCTL "sysctl")
+	IF(CMD_SYSCTL)
+		EXECUTE_PROCESS(COMMAND ${CMD_SYSCTL} "hw.model" OUTPUT_VARIABLE SYSINFO_CPU OUTPUT_STRIP_TRAILING_WHITESPACE)
+		STRING(REGEX REPLACE "^.*[=:] *(.+) *$" "\\1" SYSINFO_CPU "${SYSINFO_CPU}")
+		EXECUTE_PROCESS(COMMAND ${CMD_SYSCTL} "hw.ncpu" OUTPUT_VARIABLE SYSINFO_CORES OUTPUT_STRIP_TRAILING_WHITESPACE)
+		STRING(REGEX REPLACE "^.*[=:] *([0-9]+) *$" "\\1" SYSINFO_CORES "${SYSINFO_CORES}")
+	ENDIF(CMD_SYSCTL)
+ELSEIF (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+	SET(SYSINFO_OSVERSION "${SYSINFO_PLATFORM} ${CMAKE_SYSTEM_VERSION} (${CMAKE_SYSTEM_PROCESSOR})")
+	FIND_PROGRAM(CMD_SYSCTL "sysctl")
+	IF(CMD_SYSCTL)
+		EXECUTE_PROCESS(COMMAND ${CMD_SYSCTL} "hw.model" OUTPUT_VARIABLE SYSINFO_CPU OUTPUT_STRIP_TRAILING_WHITESPACE)
+		STRING(REGEX REPLACE "^.*[=:] *(.+) *$" "\\1" SYSINFO_CPU "${SYSINFO_CPU}")
+		EXECUTE_PROCESS(COMMAND ${CMD_SYSCTL} "hw.ncpu" OUTPUT_VARIABLE SYSINFO_CORES OUTPUT_STRIP_TRAILING_WHITESPACE)
+		STRING(REGEX REPLACE "^.*[=:] *([0-9]+) *$" "\\1" SYSINFO_CORES "${SYSINFO_CORES}")
+	ENDIF(CMD_SYSCTL)
+ELSEIF (CMAKE_SYSTEM_NAME STREQUAL "NetBSD")
+	SET(SYSINFO_OSVERSION "${SYSINFO_PLATFORM} ${CMAKE_SYSTEM_VERSION} (${CMAKE_SYSTEM_PROCESSOR})")
+	FIND_PROGRAM(CMD_SYSCTL "sysctl")
+	IF(CMD_SYSCTL)
+		EXECUTE_PROCESS(COMMAND ${CMD_SYSCTL} "hw.model" OUTPUT_VARIABLE SYSINFO_CPU OUTPUT_STRIP_TRAILING_WHITESPACE)
+		STRING(REGEX REPLACE "^.*[=:] *(.+) *$" "\\1" SYSINFO_CPU "${SYSINFO_CPU}")
+		EXECUTE_PROCESS(COMMAND ${CMD_SYSCTL} "hw.ncpu" OUTPUT_VARIABLE SYSINFO_CORES OUTPUT_STRIP_TRAILING_WHITESPACE)
+		STRING(REGEX REPLACE "^.*[=:] *([0-9]+) *$" "\\1" SYSINFO_CORES "${SYSINFO_CORES}")
+	ENDIF(CMD_SYSCTL)
+ELSEIF (WIN32)
+	# TODO
+	SET(SYSINFO_CORES "$ENV{NUMBER_OF_PROCESSORS}")
+ENDIF()
+
+STRING(STRIP ${SYSINFO_OSVERSION} SYSINFO_OSVERSION)
+STRING(STRIP ${SYSINFO_CPU} SYSINFO_CPU)
+
+GET_DIRECTORY_PROPERTY(_sysinfo_cflags_def DIRECTORY ${CMAKE_SOURCE_DIR} COMPILE_DEFINITIONS)
+GET_DIRECTORY_PROPERTY(_sysinfo_cflags_opt DIRECTORY ${CMAKE_SOURCE_DIR} COMPILE_OPTIONS)
+STRING(STRIP "${_sysinfo_cflags_def} ${_sysinfo_cflags_opt}" SYSINFO_CFLAGS)
+
+IF(EXISTS "${CMAKE_SOURCE_DIR}/.git")
+	SET(SYSINFO_VCSTYPE "VCSTYPE_GIT")
+	FIND_PROGRAM(CMD_GIT "git")
+	IF(CMD_GIT)
+		EXECUTE_PROCESS(COMMAND ${CMD_GIT} "rev-parse" "HEAD" OUTPUT_VARIABLE SYSINFO_VCSREV OUTPUT_STRIP_TRAILING_WHITESPACE)
+	ENDIF(CMD_GIT)
+ELSEIF(EXISTS "${CMAKE_SOURCE_DIR}/.svn")
+	SET(SYSINFO_VCSTYPE "VCSTYPE_SVN")
+	FIND_PROGRAM(CMD_SVNVERSION "svnversion")
+	IF(CMD_SVNVERSION)
+		EXECUTE_PROCESS(COMMAND ${CMD_SVNVERSION} OUTPUT_VARIABLE SYSINFO_VCSREV OUTPUT_STRIP_TRAILING_WHITESPACE)
+	ENDIF(CMD_SVNVERSION)
+ENDIF()
+
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/sysinfo.inc.in ${CMAKE_CURRENT_BINARY_DIR}/sysinfo.inc)
