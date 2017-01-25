@@ -20,6 +20,7 @@
  */
 #define HERCULES_CORE
 
+#include "common/hercules.h"
 #include "common/atomic.h"
 #include "common/cbasetypes.h"
 #include "common/core.h"

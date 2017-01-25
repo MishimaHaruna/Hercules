@@ -23,6 +23,7 @@
 
 #define HERCULES_CORE
 
+#include "common/hercules.h"
 #include "common/cbasetypes.h"
 #include "common/conf.h"
 #include "common/core.h"

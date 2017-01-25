@@ -21,6 +21,7 @@
 #ifndef CHAR_INT_GUILD_H
 #define CHAR_INT_GUILD_H
 
+#include "common/hercules.h"
 #include "common/db.h"
 #include "common/mmo.h"
 

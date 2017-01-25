@@ -20,8 +20,6 @@
  */
 #define HERCULES_CORE
 
-#include <mysql.h>
-
 #include "sql.h"
 
 #include "common/cbasetypes.h"
@@ -35,6 +33,7 @@
 #ifdef WIN32
 #	include "common/winapi.h" // Needed before mysql.h
 #endif
+#include <mysql.h>
 #include <stdio.h>
 #include <stdlib.h> // strtoul
 

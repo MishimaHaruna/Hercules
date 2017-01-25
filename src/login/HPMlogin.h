@@ -20,6 +20,8 @@
 #ifndef LOGIN_HPMLOGIN_H
 #define LOGIN_HPMLOGIN_H
 
+#include "common/hercules.h"
+
 #ifndef HERCULES_CORE
 #error You should never include HPMlogin.h from a plugin.
 #endif

@@ -20,6 +20,8 @@
 #ifndef CHAR_HPMCHAR_H
 #define CHAR_HPMCHAR_H
 
+#include "common/hercules.h"
+
 #ifndef HERCULES_CORE
 #error You should never include HPMchar.h from a plugin.
 #endif

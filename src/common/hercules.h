@@ -20,6 +20,10 @@
 #ifndef COMMON_HERCULES_H
 #define COMMON_HERCULES_H
 
+//#ifndef _MSC_VER
+	#include "common/config.h"
+//#endif
+
 #include "config/core.h"
 #include "common/cbasetypes.h"
 

@@ -22,6 +22,7 @@
 
 AC_INIT(Hercules)
 AC_REVISION([m4_esyscmd_s([type git >/dev/null 2>&1 && git describe --always 2>/dev/null || echo '(unknown version)'])])
+AC_CONFIG_HEADER([src/common/config.h:src/common/config.h.ac 3rdparty/libconfig/config.h:3rdparty/libconfig/config.h.ac 3rdparty/libbacktrace/config.h:3rdparty/libbacktrace/config.h.ac])
 AC_PREREQ([2.69])
 AC_CONFIG_SRCDIR([src/common/cbasetypes.h])
 AC_CONFIG_FILES([Makefile src/common/Makefile])
@@ -882,7 +883,7 @@ case "${host}" in
 			])],
 			[
 				AC_MSG_RESULT([yes])
-				CPPFLAGS="$CPPFLAGS -DHAS_TLS"
+				AC_DEFINE(HAS_TLS)
 			],
 			[
 				AC_MSG_RESULT([no])
@@ -1443,13 +1444,13 @@ AC_COMPILE_IFELSE(
 #
 # setrlimit - used to set the socket limit
 #
-AC_CHECK_FUNC([setrlimit],[CPPFLAGS="$CPPFLAGS -DHAVE_SETRLIMIT"])
+AC_CHECK_FUNC([setrlimit],[AC_DEFINE(HAVE_SETRLIMIT)])
 
 
 #
 # strnlen - string length with upper scan bound
 #
-AC_CHECK_FUNC([strnlen],[CPPFLAGS="$CPPFLAGS -DHAVE_STRNLEN"])
+AC_CHECK_FUNC([strnlen],[AC_DEFINE(HAVE_STRNLEN)])
 
 # libconfig
 AC_CHECK_FUNCS([uselocale])
@@ -1571,7 +1572,7 @@ esac
 #
 case $have_linux_epoll in
 	"yes")
-		CPPFLAGS="$CPPFLAGS -DSOCKET_EPOLL"
+		AC_DEFINE(SOCKET_EPOLL)
 		;;
 	"no")
 		# default value
@@ -1595,12 +1596,13 @@ case $enable_debug in
 		;;
 	"yes")
 		CFLAGS="$CFLAGS -g"
-		CPPFLAGS="$CPPFLAGS -DDEBUG"
+		AC_DEFINE(DEBUG)
 		AC_CHECK_FLAG(-fno-omit-frame-pointer)
 		;;
 	"gdb")
+		LDFLAGS="$LDFLAGS -ggdb"
 		CFLAGS="$CFLAGS -ggdb"
-		CPPFLAGS="$CPPFLAGS -DDEBUG"
+		AC_DEFINE(DEBUG)
 		AC_CHECK_FLAG(-fno-omit-frame-pointer)
 		;;
 esac
@@ -1983,7 +1985,7 @@ if test "$ac_cv_search_clock_gettime" != "no" ; then
 		])],
 		[
 			AC_MSG_RESULT([yes])
-			CPPFLAGS="$CPPFLAGS -DHAVE_MONOTONIC_CLOCK"
+			AC_DEFINE(HAVE_MONOTONIC_CLOCK)
 		],
 		[
 			# either it failed to compile (CLOCK_MONOTONIC undefined)
@@ -2020,7 +2022,7 @@ AC_CHECK_HEADERS([execinfo.h],
 		AC_SEARCH_LIBS([backtrace],
 			[execinfo],
 			[
-				CFLAGS="$CFLAGS -DHAVE_EXECINFO"
+				AC_DEFINE(HAVE_EXECINFO)
 			],
 			[
 			]

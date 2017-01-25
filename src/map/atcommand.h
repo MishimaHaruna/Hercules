@@ -21,6 +21,7 @@
 #ifndef MAP_ATCOMMAND_H
 #define MAP_ATCOMMAND_H
 
+#include "common/hercules.h"
 #include "map/mapdefines.h"
 #include "map/pc_groups.h"
 #include "common/hercules.h"

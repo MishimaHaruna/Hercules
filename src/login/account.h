@@ -21,6 +21,7 @@
 #ifndef LOGIN_ACCOUNT_H
 #define LOGIN_ACCOUNT_H
 
+#include "common/hercules.h"
 #include "common/cbasetypes.h"
 #include "common/mmo.h" // ACCOUNT_REG2_NUM
 

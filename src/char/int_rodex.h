@@ -20,6 +20,7 @@
 #ifndef CHAR_INT_RODEX_H
 #define CHAR_INT_RODEX_H
 
+#include "common/hercules.h"
 #include "common/mmo.h"
 #include "common/db.h"
 

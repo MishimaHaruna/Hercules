@@ -21,6 +21,7 @@
 #ifndef MAP_DATE_H
 #define MAP_DATE_H
 
+#include "common/hercules.h"
 #include "common/cbasetypes.h"
 
 #ifdef HERCULES_CORE

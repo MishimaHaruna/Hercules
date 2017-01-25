@@ -1,0 +1,9 @@
+#cmakedefine _GNU_SOURCE
+/* Define to 1 if we have uselocale */
+#cmakedefine HAVE_USELOCALE
+/* Define to 1 if we have newlocale */
+#cmakedefine HAVE_NEWLOCALE
+/* Define to 1 if we have freelocale */
+#cmakedefine HAVE_FREELOCALE
+/* Define to 1 if we have xlocale.h */
+#cmakedefine HAVE_XLOCALE_H

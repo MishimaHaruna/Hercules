@@ -20,6 +20,8 @@
 #ifndef MAP_HPMMAP_H
 #define MAP_HPMMAP_H
 
+#include "common/hercules.h"
+
 #ifndef HERCULES_CORE
 #error You should never include HPMmap.h from a plugin.
 #endif

@@ -21,7 +21,7 @@
 */
 
 #ifdef HAVE_CONFIG_H
-#include "ac_config.h"
+#include "config.h"
 #endif
 
 #include <locale.h>
