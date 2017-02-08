@@ -51,7 +51,7 @@ struct sysinfo_private {
 	int cpucores;
 	char *arch;
 	char *compiler;
-	char *cflags;
+	const char *cflags;
 	char *vcstype_name;
 	int vcstype;
 	char *vcsrevision_src;
@@ -182,10 +182,9 @@ enum windows_ver_suite {
 	msVER_SUITE_WH_SERVER      = 0x00008000, ///< Windows Home Server is installed.
 };
 
-#else // not WIN32
+#endif // WIN32
 // UNIX. Use build-time cached values
 #include "sysinfo.inc"
-#endif // WIN32
 
 // Compiler detection <http://sourceforge.net/p/predef/wiki/Compilers/>
 #if defined(__BORLANDC__)
@@ -853,7 +852,7 @@ static const char *sysinfo_arch(void)
  */
 static bool sysinfo_is64bit(void)
 {
-#ifdef _LP64
+#ifdef __64BIT__
 	return true;
 #else
 	return false;
@@ -1003,23 +1002,26 @@ static bool sysinfo_is_superuser(void)
 static void sysinfo_init(void)
 {
 	sysinfo->p->compiler = SYSINFO_COMPILER;
-#ifdef WIN32
-	sysinfo->p->platform = "Windows";
-	sysinfo->p->cflags = "N/A";
-	sysinfo_osversion_retrieve();
-	sysinfo_cpu_retrieve();
-	sysinfo_arch_retrieve();
-	sysinfo_vcsrevision_src_retrieve();
-#else
 	sysinfo->p->platform = SYSINFO_PLATFORM;
-	sysinfo->p->osversion = SYSINFO_OSVERSION;
+	if (strcmp(SYSINFO_PLATFORM, "Unknown") != 0)
+		sysinfo->p->osversion = SYSINFO_OSVERSION;
+	else
+		sysinfo_osversion_retrieve();
 	sysinfo->p->cpucores = SYSINFO_CPUCORES;
-	sysinfo->p->cpu = SYSINFO_CPU;
-	sysinfo->p->arch = SYSINFO_ARCH;
+	if (strcmp(SYSINFO_CPU, "Unknown") != 0)
+		sysinfo->p->cpu = SYSINFO_CPU;
+	else
+		sysinfo_cpu_retrieve();
+	if (strcmp(SYSINFO_ARCH, "Unknown") != 0)
+		sysinfo->p->arch = SYSINFO_ARCH;
+	else
+		sysinfo_arch_retrieve();
 	sysinfo->p->cflags = SYSINFO_CFLAGS;
 	sysinfo->p->vcstype = SYSINFO_VCSTYPE;
-	sysinfo->p->vcsrevision_src = SYSINFO_VCSREV;
-#endif
+	if (strcmp(SYSINFO_VCSREV, "Unknown") != 0)
+		sysinfo->p->vcsrevision_src = SYSINFO_VCSREV;
+	else
+		sysinfo_vcsrevision_src_retrieve();
 	sysinfo->vcsrevision_reload();
 	sysinfo_vcstype_name_retrieve(); // Must be called after setting vcstype
 }
@@ -1029,24 +1031,21 @@ static void sysinfo_init(void)
  */
 static void sysinfo_final(void)
 {
-#ifdef WIN32
-	// Only need to be free'd in win32, they're #defined elsewhere
-	if (sysinfo->p->osversion)
-		aFree(sysinfo->p->osversion);
-	if (sysinfo->p->cpu)
-		aFree(sysinfo->p->cpu);
-	if (sysinfo->p->arch)
-		aFree(sysinfo->p->arch);
-	if (sysinfo->p->vcsrevision_src)
-		aFree(sysinfo->p->vcsrevision_src);
-#endif
 	sysinfo->p->platform = NULL;
+	if (sysinfo->p->osversion != NULL && sysinfo->p->osversion != SYSINFO_OSVERSION)
+		aFree(sysinfo->p->osversion);
 	sysinfo->p->osversion = NULL;
+	if (sysinfo->p->cpu != NULL && sysinfo->p->cpu != SYSINFO_CPU)
+		aFree(sysinfo->p->cpu);
 	sysinfo->p->cpu = NULL;
+	if (sysinfo->p->arch != NULL && sysinfo->p->arch != SYSINFO_ARCH)
+		aFree(sysinfo->p->arch);
 	sysinfo->p->arch = NULL;
+	if (sysinfo->p->vcsrevision_src != NULL && sysinfo->p->vcsrevision_src != SYSINFO_VCSREV)
+		aFree(sysinfo->p->vcsrevision_src);
 	sysinfo->p->vcsrevision_src = NULL;
 	sysinfo->p->cflags = NULL;
-	if (sysinfo->p->vcsrevision_scripts)
+	if (sysinfo->p->vcsrevision_scripts != NULL)
 		aFree(sysinfo->p->vcsrevision_scripts);
 	sysinfo->p->vcsrevision_scripts = NULL;
 	if (sysinfo->p->vcstype_name)

@@ -30,7 +30,7 @@
 #define SYSINFO_CPU "@SYSINFO_CPU@"
 
 // CPU Cores (Platform-dependent)
-#define SYSINFO_CPUCORES "@SYSINFO_CORES@"
+#define SYSINFO_CPUCORES (@SYSINFO_CORES@)
 
 // OS Architecture (uname -m)
 #define SYSINFO_ARCH "@SYSINFO_ARCH@"
@@ -39,7 +39,7 @@
 #define SYSINFO_CFLAGS "@SYSINFO_CFLAGS@"
 
 // VCS Type
-#define SYSINFO_VCSTYPE @SYSINFO_VCSTYPE@
+#define SYSINFO_VCSTYPE (@SYSINFO_VCSTYPE@)
 
 // VCS Revision
 #define SYSINFO_VCSREV "@SYSINFO_VCSREV@"
