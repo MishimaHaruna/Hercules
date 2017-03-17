@@ -393,6 +393,7 @@ const char* inter_job_name(int class)
 			return inter->msg_txt(669);
 
 		default:
+			{STATIC_ASSERT(655 - 550 < MAX_JOB_NAMES, "MAX_JOB_NAMES is too small to fit all the job names.");}
 			return inter->msg_txt(620); // "Unknown Job"
 	}
 }

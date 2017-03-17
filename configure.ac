@@ -577,7 +577,7 @@ AC_LANG([C])
 #   -Werror-implicit-function-declaration -Wtrampolines
 #   -Wjump-misses-init
 
-CFLAGS="$CFLAGS -pipe -ffast-math -Wall -Wextra -Wno-sign-compare -std=c99"
+CFLAGS="$CFLAGS -pipe -ffast-math -Wall -Wextra -Wno-sign-compare -std=gnu99"
 CPPFLAGS="$CPPFLAGS -I../common"
 LDFLAGS="$LDFLAGS"
 

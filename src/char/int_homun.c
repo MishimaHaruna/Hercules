@@ -54,6 +54,7 @@ void mapif_homunculus_created(int fd, int account_id, const struct s_homunculus 
 	nullpo_retv(sh);
 	WFIFOHEAD(fd, sizeof(struct s_homunculus)+9);
 	WFIFOW(fd,0) = 0x3890;
+	STATIC_ASSERT(9 + sizeof(struct s_homunculus) < UINT16_MAX, "struct s_homunculus is too large to be sent as a single packet.");
 	WFIFOW(fd,2) = sizeof(struct s_homunculus)+9;
 	WFIFOL(fd,4) = account_id;
 	WFIFOB(fd,8)= flag;

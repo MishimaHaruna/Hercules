@@ -53,7 +53,7 @@
 #include <time.h>
 
 struct quest_interface quest_s;
-struct quest_db *db_data[MAX_QUEST_DB]; ///< Quest database
+struct quest_db *db_data[MAX_QUEST_DB]; ///< Quest database // TODO: This is less than 10% filled. Possibly worth to move to a DBMap.
 
 struct quest_interface *quest;
 

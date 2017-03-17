@@ -3638,6 +3638,7 @@ void char_map_auth_ok(int fd, int account_id, struct char_auth_node* node, struc
 	WFIFOHEAD(fd,25 + sizeof(struct mmo_charstatus));
 	WFIFOW(fd,0) = 0x2afd;
 	WFIFOW(fd,2) = 25 + sizeof(struct mmo_charstatus);
+	STATIC_ASSERT(25 + sizeof(struct mmo_charstatus) < UINT16_MAX, "struct mmo_charstatus is too large to be sent in a single packet.");
 	WFIFOL(fd,4) = account_id;
 	if (node)
 	{

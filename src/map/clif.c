@@ -7828,6 +7828,7 @@ void clif_guild_expulsionlist(struct map_session_data* sd) {
 
 	WFIFOHEAD(fd,4 + MAX_GUILDEXPULSION * offset);
 	WFIFOW(fd,0) = 0x163;
+	STATIC_ASSERT(4 + MAX_GUILDEXPULSION * offset < UINT16_MAX, "MAX_GUILDEXPULSION is too large to be sent in a single packet.");
 
 	for( i = 0; i < MAX_GUILDEXPULSION; i++ )
 	{
@@ -13836,6 +13837,7 @@ void clif_PMIgnoreList(struct map_session_data* sd) {
 	fd = sd->fd;
 	WFIFOHEAD(fd,4+ARRAYLENGTH(sd->ignore)*NAME_LENGTH);
 	WFIFOW(fd,0) = 0xd4;
+	STATIC_ASSERT(4 + ARRAYLENGTH(sd->ignore) * NAME_LENGTH < UINT16_MAX, "Ignore list is too large to be sent as a single packet.");
 
 	for( i = 0; i < ARRAYLENGTH(sd->ignore) && sd->ignore[i].name[0]; i++ ) {
 		memcpy(WFIFOP(fd,4+i*NAME_LENGTH), sd->ignore[i].name, NAME_LENGTH);
@@ -13951,6 +13953,7 @@ void clif_friendslist_send(struct map_session_data *sd)
 	// Send friends list
 	WFIFOHEAD(fd, MAX_FRIENDS * 32 + 4);
 	WFIFOW(fd, 0) = 0x201;
+	STATIC_ASSERT(MAX_FRIENDS * 32 + 4 < UINT16_MAX, "Friends list is too large to be sent as a single packet.");
 	for(i = 0; i < MAX_FRIENDS && sd->status.friends[i].char_id; i++) {
 		WFIFOL(fd, 4 + 32 * i + 0) = sd->status.friends[i].account_id;
 		WFIFOL(fd, 4 + 32 * i + 4) = sd->status.friends[i].char_id;
@@ -14781,6 +14784,7 @@ void clif_Mail_refreshinbox(struct map_session_data *sd)
 	nullpo_retv(sd);
 	md = &sd->mail.inbox;
 	len = 8 + (73 * md->amount);
+	STATIC_ASSERT(8 + 73 * MAIL_MAX_INBOX < UINT16_MAX, "Mail inbox is too large to be sent as a single packet.");
 
 	WFIFOHEAD(fd,len);
 	WFIFOW(fd,0) = 0x240;
@@ -15807,16 +15811,14 @@ void clif_quest_send_list(struct map_session_data *sd)
 	real_len = sizeof(*packet);
 
 	packet->PacketType = questListType;
-	packet->questCount = sd->avail_quests;
 
 	for (i = 0; i < sd->avail_quests; i++) {
 		struct packet_quest_list_info *info = (struct packet_quest_list_info *)(buf+real_len);
+		int this_len = sizeof(*info);
 #if PACKETVER >= 20141022
 		struct quest_db *qi = quest->db(sd->quest_log[i].quest_id);
 		int j;
 #endif // PACKETVER >= 20141022
-		real_len += sizeof(*info);
-
 		info->questID = sd->quest_log[i].quest_id;
 		info->active = sd->quest_log[i].state;
 #if PACKETVER >= 20141022
@@ -15827,7 +15829,7 @@ void clif_quest_send_list(struct map_session_data *sd)
 		for (j = 0; j < qi->objectives_count; j++) {
 			struct mob_db *mob_data;
 			Assert_retb(j < MAX_QUEST_OBJECTIVES);
-			real_len += sizeof(info->objectives[j]);
+			this_len += sizeof(info->objectives[j]);
 
 			mob_data = mob->db(qi->objectives[j].mob);
 
@@ -15837,7 +15839,14 @@ void clif_quest_send_list(struct map_session_data *sd)
 			safestrncpy(info->objectives[j].mobName, mob_data->jname, sizeof(info->objectives[j].mobName));
 		}
 #endif // PACKETVER >= 20141022
+		if (real_len + this_len >= UINT16_MAX) {
+			ShowWarning("clif_quest_send_list: Questlog too large for \"%s\" (quests=%d, char_id=%d, account_id=%d). Limiting display to %d quests.",
+					sd->status.name, sd->avail_quests, sd->status.char_id, sd->status.account_id, i);
+			break;
+		}
+		real_len += this_len;
 	}
+	packet->questCount = i;
 	packet->PacketLength = real_len;
 	clif->send(buf, real_len, &sd->bl, SELF);
 	aFree(buf);
@@ -15849,17 +15858,24 @@ void clif_quest_send_mission(struct map_session_data *sd)
 {
 	int fd = sd->fd;
 	int i, j;
-	int len;
+	int len, amount;
 	struct mob_db *monster;
 
 	nullpo_retv(sd);
+	amount = sd->avail_quests;
 	len = sd->avail_quests*104+8;
+	if (len >= UINT16_MAX) {
+		amount = (UINT16_MAX - 8) / 104;
+		len = amount * 104 + 8;
+		ShowWarning("clif_quest_send_mission: Questlog too large for \"%s\" (quests=%d, char_id=%d, account_id=%d). Limiting display to %d quests.",
+				sd->status.name, sd->avail_quests, sd->status.char_id, sd->status.account_id, amount);
+	}
 	WFIFOHEAD(fd, len);
 	WFIFOW(fd, 0) = 0x2b2;
 	WFIFOW(fd, 2) = len;
-	WFIFOL(fd, 4) = sd->avail_quests;
+	WFIFOL(fd, 4) = amount;
 
-	for (i = 0; i < sd->avail_quests; i++) {
+	for (i = 0; i < amount; i++) {
 		struct quest_db *qi = quest->db(sd->quest_log[i].quest_id);
 		WFIFOL(fd, i*104+8) = sd->quest_log[i].quest_id;
 		WFIFOL(fd, i*104+12) = sd->quest_log[i].time - qi->time;
@@ -16139,6 +16155,7 @@ void clif_mercenary_skillblock(struct map_session_data *sd)
 
 	fd = sd->fd;
 	WFIFOHEAD(fd,4+37*MAX_MERCSKILL);
+	STATIC_ASSERT(4 + 37 * MAX_MERCSKILL < UINT16_MAX, "MAX_MERCSKILL is too large to be sent in a single packet.");
 	WFIFOW(fd,0) = 0x29d;
 	for (i = 0; i < MAX_MERCSKILL; i++) {
 		int id = md->db->skill[i].id;
@@ -17136,6 +17153,7 @@ void clif_search_store_info_ack(struct map_session_data* sd)
 	end   = min(sd->searchstore.count, start+SEARCHSTORE_RESULTS_PER_PAGE);
 
 	WFIFOHEAD(fd,7+(end-start)*blocksize);
+	STATIC_ASSERT(7 + blocksize * SEARCHSTORE_RESULTS_PER_PAGE < UINT16_MAX, "SEARCHSTORE_RESULTS_PER_PAGE is too large to be sent in a single packet.");
 	WFIFOW(fd,0) = 0x836;
 	WFIFOW(fd,2) = 7+(end-start)*blocksize;
 	WFIFOB(fd,4) = !sd->searchstore.pages;
