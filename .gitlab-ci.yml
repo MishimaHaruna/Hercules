@@ -436,6 +436,7 @@ percona:
 pages:
   only:
     - master
+    - gitlab-ci-reducebuilds-test
   stage: extras
   image: debian:unstable
   before_script:
