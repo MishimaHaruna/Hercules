@@ -2,7 +2,7 @@
  * This file is part of Hercules.
  * http://herc.ws - http://github.com/HerculesWS/Hercules
  *
- * Copyright (C) 2012-2016  Hercules Dev Team
+ * Copyright (C) 2012-2018  Hercules Dev Team
  * Copyright (C)  Athena Dev Teams
  *
  * Hercules is free software: you can redistribute it and/or modify
@@ -43,10 +43,7 @@
 #include <math.h> // floor()
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/stat.h> // cache purposes [Ind/Hercules]
-
-struct HCache_interface HCache_s;
-struct HCache_interface *HCache;
+#include <sys/stat.h>
 
 /// Dumps given buffer into file pointed to by a handle.
 void WriteDump(FILE* fp, const void* buffer, size_t length)
@@ -433,125 +430,4 @@ const char* timestamp2string(char* str, size_t size, time_t timestamp, const cha
 	len = strftime(str, size, format, localtime(&timestamp));
 	memset(str + len, '\0', size - len);
 	return str;
-}
-
-/* [Ind/Hercules] Caching */
-bool HCache_check(const char *file)
-{
-	struct stat bufa, bufb;
-	FILE *first, *second;
-	char s_path[255], dT[1];
-	time_t rtime;
-
-	nullpo_retr(false, file);
-	if (!(first = fopen(file,"rb")))
-		return false;
-
-	if (file[0] == '.' && file[1] == '/')
-		file += 2;
-	else if (file[0] == '.')
-		file++;
-
-	snprintf(s_path, 255, "./cache/%s", file);
-
-	if (!(second = fopen(s_path,"rb"))) {
-		fclose(first);
-		return false;
-	}
-
-	if (fread(dT,sizeof(dT),1,second) != 1
-	 || fread(&rtime,sizeof(rtime),1,second) != 1
-	 || dT[0] != HCACHE_KEY
-	 || HCache->recompile_time > rtime) {
-		fclose(first);
-		fclose(second);
-		return false;
-	}
-
-	if (fstat(fileno(first), &bufa) != 0) {
-		fclose(first);
-		fclose(second);
-		return false;
-	}
-	fclose(first);
-
-	if (fstat(fileno(second), &bufb) != 0) {
-		fclose(second);
-		return false;
-	}
-	fclose(second);
-
-	if (bufa.st_mtime > bufb.st_mtime)
-		return false;
-
-	return true;
-}
-
-FILE *HCache_open(const char *file, const char *opt)
-{
-	FILE *first;
-	char s_path[255];
-
-	nullpo_retr(NULL, file);
-	nullpo_retr(NULL, opt);
-
-	if( file[0] == '.' && file[1] == '/' )
-		file += 2;
-	else if( file[0] == '.' )
-		file++;
-
-	snprintf(s_path, 255, "./cache/%s", file);
-
-	if( !(first = fopen(s_path,opt)) ) {
-		return NULL;
-	}
-
-	if( opt[0] != 'r' ) {
-		char dT[1];/* 1-byte key to ensure our method is the latest, we can modify to ensure the method matches */
-		dT[0] = HCACHE_KEY;
-		hwrite(dT,sizeof(dT),1,first);
-		hwrite(&HCache->recompile_time,sizeof(HCache->recompile_time),1,first);
-	}
-	if (fseek(first, 20, SEEK_SET) != 0) { // skip first 20, might wanna store something else later
-		fclose(first);
-		return NULL;
-	}
-
-	return first;
-}
-
-void HCache_init(void)
-{
-	struct stat buf;
-	if (stat(SERVER_NAME, &buf) != 0) {
-		ShowWarning("Unable to open '%s', caching capabilities have been disabled!\n",SERVER_NAME);
-		return;
-	}
-
-	HCache->recompile_time = buf.st_mtime;
-	HCache->enabled = true;
-}
-
-/* transit to fread, shields vs warn_unused_result */
-size_t hread(void *ptr, size_t size, size_t count, FILE *stream)
-{
-	return fread(ptr, size, count, stream);
-}
-
-/* transit to fwrite, shields vs warn_unused_result */
-size_t hwrite(const void *ptr, size_t size, size_t count, FILE *stream)
-{
-	return fwrite(ptr, size, count, stream);
-}
-
-void HCache_defaults(void)
-{
-	HCache = &HCache_s;
-
-	HCache->init = HCache_init;
-
-	HCache->check = HCache_check;
-	HCache->open = HCache_open;
-	HCache->recompile_time = 0;
-	HCache->enabled = false;
 }

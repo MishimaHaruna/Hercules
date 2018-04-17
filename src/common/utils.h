@@ -2,7 +2,7 @@
  * This file is part of Hercules.
  * http://herc.ws - http://github.com/HerculesWS/Hercules
  *
- * Copyright (C) 2012-2016  Hercules Dev Team
+ * Copyright (C) 2012-2018  Hercules Dev Team
  * Copyright (C)  Athena Dev Teams
  *
  * Hercules is free software: you can redistribute it and/or modify
@@ -27,9 +27,6 @@
 #ifndef WIN32
 #	include <unistd.h> // sleep()
 #endif
-
-/* [HCache] 1-byte key to ensure our method is the latest, we can modify to ensure the method matches */
-#define HCACHE_KEY 'k'
 
 //Caps values to min/max
 #define cap_value(a, min, max) (((a) >= (max)) ? (max) : ((a) <= (min)) ? (min) : (a))
@@ -69,9 +66,6 @@ extern uint16 GetUShort(const unsigned char* buf);
 extern uint32 GetULong(const unsigned char* buf);
 extern int32 GetLong(const unsigned char* buf);
 extern float GetFloat(const unsigned char* buf);
-
-size_t hread(void * ptr, size_t size, size_t count, FILE * stream);
-size_t hwrite(const void * ptr, size_t size, size_t count, FILE * stream);
 #endif // HERCULES_CORE
 
 #ifdef WIN32
@@ -79,22 +73,5 @@ size_t hwrite(const void * ptr, size_t size, size_t count, FILE * stream);
 #else // ! WIN32
 #define HSleep(x) sleep(x)
 #endif
-
-/* [Ind/Hercules] Caching */
-struct HCache_interface {
-	void (*init) (void);
-	/* */
-	bool (*check) (const char *file);
-	FILE *(*open) (const char *file, const char *opt);
-	/* */
-	time_t recompile_time;
-	bool enabled;
-};
-
-#ifdef HERCULES_CORE
-void HCache_defaults(void);
-#endif // HERCULES_CORE
-
-HPShared struct HCache_interface *HCache;
 
 #endif /* COMMON_UTILS_H */

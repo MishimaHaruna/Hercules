@@ -2,7 +2,7 @@
  * This file is part of Hercules.
  * http://herc.ws - http://github.com/HerculesWS/Hercules
  *
- * Copyright (C) 2012-2016  Hercules Dev Team
+ * Copyright (C) 2012-2018  Hercules Dev Team
  * Copyright (C)  Athena Dev Teams
  *
  * Hercules is free software: you can redistribute it and/or modify
@@ -597,9 +597,6 @@ struct itemdb_interface {
 	void (*read_chains) (void);
 	void (*read_packages) (void);
 	void (*read_options) (void);
-	/* */
-	void (*write_cached_packages) (const char *config_filename);
-	bool (*read_cached_packages) (const char *config_filename);
 	/* */
 	struct item_data* (*name2id) (const char *str);
 	struct item_data* (*search_name) (const char *name);

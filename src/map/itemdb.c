@@ -2,7 +2,7 @@
  * This file is part of Hercules.
  * http://herc.ws - http://github.com/HerculesWS/Hercules
  *
- * Copyright (C) 2012-2016  Hercules Dev Team
+ * Copyright (C) 2012-2018  Hercules Dev Team
  * Copyright (C)  Athena Dev Teams
  *
  * Hercules is free software: you can redistribute it and/or modify
@@ -876,209 +876,6 @@ void itemdb_read_groups(void) {
 	ShowStatus("Done reading '"CL_WHITE"%d"CL_RESET"' entries in '"CL_WHITE"%s"CL_RESET"'.\n", count, config_filename);
 }
 
-/* [Ind/Hercules] - HCache for Packages */
-void itemdb_write_cached_packages(const char *config_filename) {
-	FILE *file;
-	unsigned short pcount = itemdb->package_count;
-	unsigned short i;
-
-	nullpo_retv(config_filename);
-	if( !(file = HCache->open(config_filename,"wb")) ) {
-		return;
-	}
-
-	// first 2 bytes = package count
-	hwrite(&pcount,sizeof(pcount),1,file);
-
-	for(i = 0; i < pcount; i++) {
-		unsigned short id = itemdb->packages[i].id, random_qty = itemdb->packages[i].random_qty, must_qty = itemdb->packages[i].must_qty;
-		unsigned short c;
-		//into a package, first 2 bytes = id.
-		hwrite(&id,sizeof(id),1,file);
-		//next 2 bytes = must count
-		hwrite(&must_qty,sizeof(must_qty),1,file);
-		//next 2 bytes = random count
-		hwrite(&random_qty,sizeof(random_qty),1,file);
-		//now we loop into must
-		for(c = 0; c < must_qty; c++) {
-			struct item_package_must_entry *entry = &itemdb->packages[i].must_items[c];
-			unsigned char announce = entry->announce == 1 ? 1 : 0, named = entry->named == 1 ? 1 : 0, force_serial = entry->force_serial == 1 ? 1 : 0;
-			//first 2 byte = item id
-			hwrite(&entry->id,sizeof(entry->id),1,file);
-			//next 2 byte = qty
-			hwrite(&entry->qty,sizeof(entry->qty),1,file);
-			//next 2 byte = hours
-			hwrite(&entry->hours,sizeof(entry->hours),1,file);
-			//next 1 byte = announce (1:0)
-			hwrite(&announce,sizeof(announce),1,file);
-			//next 1 byte = named (1:0)
-			hwrite(&named,sizeof(named),1,file);
-			//next 1 byte = ForceSerial (1:0)
-			hwrite(&force_serial,sizeof(force_serial),1,file);
-		}
-		//now we loop into random groups
-		for(c = 0; c < random_qty; c++) {
-			struct item_package_rand_group *group = &itemdb->packages[i].random_groups[c];
-			unsigned short group_qty = group->random_qty, h;
-
-			//next 2 bytes = how many entries in this group
-			hwrite(&group_qty,sizeof(group_qty),1,file);
-			//now we loop into the group's list
-			for(h = 0; h < group_qty; h++) {
-				struct item_package_rand_entry *entry = &itemdb->packages[i].random_groups[c].random_list[h];
-				unsigned char announce = entry->announce == 1 ? 1 : 0, named = entry->named == 1 ? 1 : 0, force_serial = entry->force_serial == 1 ? 1 : 0;
-				//first 2 byte = item id
-				hwrite(&entry->id,sizeof(entry->id),1,file);
-				//next 2 byte = qty
-				hwrite(&entry->qty,sizeof(entry->qty),1,file);
-				//next 2 byte = rate
-				hwrite(&entry->rate,sizeof(entry->rate),1,file);
-				//next 2 byte = hours
-				hwrite(&entry->hours,sizeof(entry->hours),1,file);
-				//next 1 byte = announce (1:0)
-				hwrite(&announce,sizeof(announce),1,file);
-				//next 1 byte = named (1:0)
-				hwrite(&named,sizeof(named),1,file);
-				//next 1 byte = ForceSerial (1:0)
-				hwrite(&force_serial,sizeof(force_serial),1,file);
-			}
-		}
-	}
-	fclose(file);
-
-	return;
-}
-bool itemdb_read_cached_packages(const char *config_filename) {
-	FILE *file;
-	unsigned short pcount = 0;
-	unsigned short i;
-
-	nullpo_retr(false, config_filename);
-	if( !(file = HCache->open(config_filename,"rb")) ) {
-		return false;
-	}
-
-	// first 2 bytes = package count
-	hread(&pcount,sizeof(pcount),1,file);
-
-	CREATE(itemdb->packages, struct item_package, pcount);
-	itemdb->package_count = pcount;
-
-	for( i = 0; i < pcount; i++ ) {
-		unsigned short id = 0, random_qty = 0, must_qty = 0;
-		struct item_data *pdata;
-		struct item_package *package = &itemdb->packages[i];
-		unsigned short c;
-
-		//into a package, first 2 bytes = id.
-		hread(&id,sizeof(id),1,file);
-		//next 2 bytes = must count
-		hread(&must_qty,sizeof(must_qty),1,file);
-		//next 2 bytes = random count
-		hread(&random_qty,sizeof(random_qty),1,file);
-
-		if( !(pdata = itemdb->exists(id)) )
-			ShowWarning("itemdb_read_cached_packages: unknown package item '%d', skipping..\n",id);
-		else
-			pdata->package = &itemdb->packages[i];
-
-		package->id = id;
-		package->random_qty = random_qty;
-		package->must_qty = must_qty;
-		package->must_items = NULL;
-		package->random_groups = NULL;
-
-		if( package->must_qty ) {
-			CREATE(package->must_items, struct item_package_must_entry, package->must_qty);
-			//now we loop into must
-			for(c = 0; c < package->must_qty; c++) {
-				struct item_package_must_entry *entry = &itemdb->packages[i].must_items[c];
-				unsigned short mid = 0, qty = 0, hours = 0;
-				unsigned char announce = 0, named = 0, force_serial = 0;
-				struct item_data *data;
-				//first 2 byte = item id
-				hread(&mid,sizeof(mid),1,file);
-				//next 2 byte = qty
-				hread(&qty,sizeof(qty),1,file);
-				//next 2 byte = hours
-				hread(&hours,sizeof(hours),1,file);
-				//next 1 byte = announce (1:0)
-				hread(&announce,sizeof(announce),1,file);
-				//next 1 byte = named (1:0)
-				hread(&named,sizeof(named),1,file);
-				//next 1 byte = ForceSerial (1:0)
-				hread(&force_serial,sizeof(force_serial),1,file);
-
-				if( !(data = itemdb->exists(mid)) )
-					ShowWarning("itemdb_read_cached_packages: unknown item '%d' in package '%s'!\n",mid,itemdb_name(package->id));
-
-				entry->id = data ? data->nameid : 0;
-				entry->hours = hours;
-				entry->qty = qty;
-				entry->announce = announce ? 1 : 0;
-				entry->named = named ? 1 : 0;
-				entry->force_serial = force_serial ? 1 : 0;
-			}
-		}
-		if( package->random_qty ) {
-			//now we loop into random groups
-			CREATE(package->random_groups, struct item_package_rand_group, package->random_qty);
-			for(c = 0; c < package->random_qty; c++) {
-				unsigned short group_qty = 0, h;
-				struct item_package_rand_entry *prev = NULL;
-
-				//next 2 bytes = how many entries in this group
-				hread(&group_qty,sizeof(group_qty),1,file);
-
-				package->random_groups[c].random_qty = group_qty;
-				CREATE(package->random_groups[c].random_list, struct item_package_rand_entry, package->random_groups[c].random_qty);
-
-				//now we loop into the group's list
-				for(h = 0; h < group_qty; h++) {
-					struct item_package_rand_entry *entry = &itemdb->packages[i].random_groups[c].random_list[h];
-					unsigned short mid = 0, qty = 0, hours = 0, rate = 0;
-					unsigned char announce = 0, named = 0, force_serial = 0;
-					struct item_data *data;
-
-					if( prev ) prev->next = entry;
-
-					//first 2 byte = item id
-					hread(&mid,sizeof(mid),1,file);
-					//next 2 byte = qty
-					hread(&qty,sizeof(qty),1,file);
-					//next 2 byte = rate
-					hread(&rate,sizeof(rate),1,file);
-					//next 2 byte = hours
-					hread(&hours,sizeof(hours),1,file);
-					//next 1 byte = announce (1:0)
-					hread(&announce,sizeof(announce),1,file);
-					//next 1 byte = named (1:0)
-					hread(&named,sizeof(named),1,file);
-					//next 1 byte = ForceSerial (1:0)
-					hread(&force_serial,sizeof(force_serial),1,file);
-
-					if( !(data = itemdb->exists(mid)) )
-						ShowWarning("itemdb_read_cached_packages: unknown item '%d' in package '%s'!\n",mid,itemdb_name(package->id));
-
-					entry->id = data ? data->nameid : 0;
-					entry->rate = rate;
-					entry->hours = hours;
-					entry->qty = qty;
-					entry->announce = announce ? 1 : 0;
-					entry->named = named ? 1 : 0;
-					entry->force_serial = force_serial ? 1 : 0;
-					prev = entry;
-				}
-				if( prev )
-					prev->next = &itemdb->packages[i].random_groups[c].random_list[0];
-			}
-		}
-	}
-	fclose(file);
-	ShowStatus("Done reading '"CL_WHITE"%hu"CL_RESET"' entries in '"CL_WHITE"%s"CL_RESET"' ("CL_GREEN"C"CL_RESET").\n", pcount, config_filename);
-
-	return true;
-}
 void itemdb_read_packages(void) {
 	struct config_t item_packages_conf;
 	struct config_setting_t *itg = NULL, *it = NULL, *t = NULL;
@@ -1091,11 +888,6 @@ void itemdb_read_packages(void) {
 	int i = 0, count = 0, c = 0, highest_gcount = 0;
 	unsigned int *must = NULL, *random = NULL, *rgroup = NULL, **rgroups = NULL;
 	struct item_package_rand_entry **prev = NULL;
-
-	if( HCache->check(config_filename) ) {
-		if( itemdb->read_cached_packages(config_filename) )
-			return;
-	}
 
 	if (!libconfig->load_file(&item_packages_conf, config_filename))
 		return;
@@ -1302,9 +1094,6 @@ void itemdb_read_packages(void) {
 	aFree(prev);
 
 	libconfig->destroy(&item_packages_conf);
-
-	if( HCache->enabled )
-		itemdb->write_cached_packages(config_filename);
 
 	ShowStatus("Done reading '"CL_WHITE"%d"CL_RESET"' entries in '"CL_WHITE"%s"CL_RESET"'.\n", count, config_filename);
 }
@@ -2673,9 +2462,6 @@ void itemdb_defaults(void) {
 	itemdb->read_chains = itemdb_read_chains;
 	itemdb->read_packages = itemdb_read_packages;
 	itemdb->read_options = itemdb_read_options;
-	/* */
-	itemdb->write_cached_packages = itemdb_write_cached_packages;
-	itemdb->read_cached_packages = itemdb_read_cached_packages;
 	/* */
 	itemdb->name2id = itemdb_name2id;
 	itemdb->search_name = itemdb_searchname;

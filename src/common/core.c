@@ -2,7 +2,7 @@
  * This file is part of Hercules.
  * http://herc.ws - http://github.com/HerculesWS/Hercules
  *
- * Copyright (C) 2012-2016  Hercules Dev Team
+ * Copyright (C) 2012-2018  Hercules Dev Team
  * Copyright (C)  Athena Dev Teams
  *
  * Hercules is free software: you can redistribute it and/or modify
@@ -255,7 +255,6 @@ void core_defaults(void)
 	nullpo_defaults();
 #ifndef MINICORE
 	hpm_defaults();
-	HCache_defaults();
 #endif
 	sysinfo_defaults();
 	console_defaults();
@@ -545,8 +544,6 @@ int main (int argc, char **argv)
 	rnd->init();
 
 	console->init();
-
-	HCache->init();
 
 	HPM->init();
 
