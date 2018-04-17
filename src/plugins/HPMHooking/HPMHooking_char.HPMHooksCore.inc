@@ -26,12 +26,6 @@
 /* GENERATED FILE DO NOT EDIT */
 
 struct {
-	struct HPMHookPoint *HP_HCache_init_pre;
-	struct HPMHookPoint *HP_HCache_init_post;
-	struct HPMHookPoint *HP_HCache_check_pre;
-	struct HPMHookPoint *HP_HCache_check_post;
-	struct HPMHookPoint *HP_HCache_open_pre;
-	struct HPMHookPoint *HP_HCache_open_post;
 	struct HPMHookPoint *HP_chr_waiting_disconnect_pre;
 	struct HPMHookPoint *HP_chr_waiting_disconnect_post;
 	struct HPMHookPoint *HP_chr_delete_char_sql_pre;
@@ -1563,12 +1557,6 @@ struct {
 } list;
 
 struct {
-	int HP_HCache_init_pre;
-	int HP_HCache_init_post;
-	int HP_HCache_check_pre;
-	int HP_HCache_check_post;
-	int HP_HCache_open_pre;
-	int HP_HCache_open_post;
 	int HP_chr_waiting_disconnect_pre;
 	int HP_chr_waiting_disconnect_post;
 	int HP_chr_delete_char_sql_pre;
@@ -3100,7 +3088,6 @@ struct {
 } count;
 
 struct {
-	struct HCache_interface HCache;
 	struct char_interface chr;
 	struct cmdline_interface cmdline;
 	struct console_interface console;

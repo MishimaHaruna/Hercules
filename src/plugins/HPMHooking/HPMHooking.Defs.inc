@@ -25,14 +25,6 @@
 
 /* GENERATED FILE DO NOT EDIT */
 
-#ifdef COMMON_UTILS_H /* HCache */
-typedef void (*HPMHOOK_pre_HCache_init) (void);
-typedef void (*HPMHOOK_post_HCache_init) (void);
-typedef bool (*HPMHOOK_pre_HCache_check) (const char **file);
-typedef bool (*HPMHOOK_post_HCache_check) (bool retVal___, const char *file);
-typedef FILE* (*HPMHOOK_pre_HCache_open) (const char **file, const char **opt);
-typedef FILE* (*HPMHOOK_post_HCache_open) (FILE* retVal___, const char *file, const char *opt);
-#endif // COMMON_UTILS_H
 #ifdef LOGIN_ACCOUNT_H /* account */
 typedef struct Sql* (*HPMHOOK_pre_account_db_sql_up) (AccountDB **self);
 typedef struct Sql* (*HPMHOOK_post_account_db_sql_up) (struct Sql* retVal___, AccountDB *self);
@@ -3568,10 +3560,6 @@ typedef void (*HPMHOOK_pre_itemdb_read_packages) (void);
 typedef void (*HPMHOOK_post_itemdb_read_packages) (void);
 typedef void (*HPMHOOK_pre_itemdb_read_options) (void);
 typedef void (*HPMHOOK_post_itemdb_read_options) (void);
-typedef void (*HPMHOOK_pre_itemdb_write_cached_packages) (const char **config_filename);
-typedef void (*HPMHOOK_post_itemdb_write_cached_packages) (const char *config_filename);
-typedef bool (*HPMHOOK_pre_itemdb_read_cached_packages) (const char **config_filename);
-typedef bool (*HPMHOOK_post_itemdb_read_cached_packages) (bool retVal___, const char *config_filename);
 typedef struct item_data* (*HPMHOOK_pre_itemdb_name2id) (const char **str);
 typedef struct item_data* (*HPMHOOK_post_itemdb_name2id) (struct item_data* retVal___, const char *str);
 typedef struct item_data* (*HPMHOOK_pre_itemdb_search_name) (const char **name);

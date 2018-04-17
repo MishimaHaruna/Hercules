@@ -26,12 +26,6 @@
 /* GENERATED FILE DO NOT EDIT */
 
 struct {
-	struct HPMHookPoint *HP_HCache_init_pre;
-	struct HPMHookPoint *HP_HCache_init_post;
-	struct HPMHookPoint *HP_HCache_check_pre;
-	struct HPMHookPoint *HP_HCache_check_post;
-	struct HPMHookPoint *HP_HCache_open_pre;
-	struct HPMHookPoint *HP_HCache_open_post;
 	struct HPMHookPoint *HP_atcommand_init_pre;
 	struct HPMHookPoint *HP_atcommand_init_post;
 	struct HPMHookPoint *HP_atcommand_final_pre;
@@ -2864,10 +2858,6 @@ struct {
 	struct HPMHookPoint *HP_itemdb_read_packages_post;
 	struct HPMHookPoint *HP_itemdb_read_options_pre;
 	struct HPMHookPoint *HP_itemdb_read_options_post;
-	struct HPMHookPoint *HP_itemdb_write_cached_packages_pre;
-	struct HPMHookPoint *HP_itemdb_write_cached_packages_post;
-	struct HPMHookPoint *HP_itemdb_read_cached_packages_pre;
-	struct HPMHookPoint *HP_itemdb_read_cached_packages_post;
 	struct HPMHookPoint *HP_itemdb_name2id_pre;
 	struct HPMHookPoint *HP_itemdb_name2id_post;
 	struct HPMHookPoint *HP_itemdb_search_name_pre;
@@ -6361,12 +6351,6 @@ struct {
 } list;
 
 struct {
-	int HP_HCache_init_pre;
-	int HP_HCache_init_post;
-	int HP_HCache_check_pre;
-	int HP_HCache_check_post;
-	int HP_HCache_open_pre;
-	int HP_HCache_open_post;
 	int HP_atcommand_init_pre;
 	int HP_atcommand_init_post;
 	int HP_atcommand_final_pre;
@@ -9199,10 +9183,6 @@ struct {
 	int HP_itemdb_read_packages_post;
 	int HP_itemdb_read_options_pre;
 	int HP_itemdb_read_options_post;
-	int HP_itemdb_write_cached_packages_pre;
-	int HP_itemdb_write_cached_packages_post;
-	int HP_itemdb_read_cached_packages_pre;
-	int HP_itemdb_read_cached_packages_post;
 	int HP_itemdb_name2id_pre;
 	int HP_itemdb_name2id_post;
 	int HP_itemdb_search_name_pre;
@@ -12696,7 +12676,6 @@ struct {
 } count;
 
 struct {
-	struct HCache_interface HCache;
 	struct atcommand_interface atcommand;
 	struct battle_interface battle;
 	struct battleground_interface bg;

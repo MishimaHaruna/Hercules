@@ -26,10 +26,6 @@
 /* GENERATED FILE DO NOT EDIT */
 
 struct HookingPointData HookingPoints[] = {
-/* HCache_interface */
-	{ HP_POP(HCache->init, HP_HCache_init) },
-	{ HP_POP(HCache->check, HP_HCache_check) },
-	{ HP_POP(HCache->open, HP_HCache_open) },
 /* account_interface */
 	{ HP_POP(account->db_sql_up, HP_account_db_sql_up) },
 	{ HP_POP(account->mmo_send_accreg2, HP_account_mmo_send_accreg2) },

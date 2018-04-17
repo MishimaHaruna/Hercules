@@ -26,10 +26,6 @@
 /* GENERATED FILE DO NOT EDIT */
 
 struct HookingPointData HookingPoints[] = {
-/* HCache_interface */
-	{ HP_POP(HCache->init, HP_HCache_init) },
-	{ HP_POP(HCache->check, HP_HCache_check) },
-	{ HP_POP(HCache->open, HP_HCache_open) },
 /* atcommand_interface */
 	{ HP_POP(atcommand->init, HP_atcommand_init) },
 	{ HP_POP(atcommand->final, HP_atcommand_final) },
@@ -1470,8 +1466,6 @@ struct HookingPointData HookingPoints[] = {
 	{ HP_POP(itemdb->read_chains, HP_itemdb_read_chains) },
 	{ HP_POP(itemdb->read_packages, HP_itemdb_read_packages) },
 	{ HP_POP(itemdb->read_options, HP_itemdb_read_options) },
-	{ HP_POP(itemdb->write_cached_packages, HP_itemdb_write_cached_packages) },
-	{ HP_POP(itemdb->read_cached_packages, HP_itemdb_read_cached_packages) },
 	{ HP_POP(itemdb->name2id, HP_itemdb_name2id) },
 	{ HP_POP(itemdb->search_name, HP_itemdb_search_name) },
 	{ HP_POP(itemdb->search_name_array, HP_itemdb_search_name_array) },

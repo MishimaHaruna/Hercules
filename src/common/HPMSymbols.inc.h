@@ -26,9 +26,6 @@
 /* GENERATED FILE DO NOT EDIT */
 
 #if !defined(HERCULES_CORE)
-#ifdef COMMON_UTILS_H /* HCache */
-struct HCache_interface *HCache;
-#endif // COMMON_UTILS_H
 #ifdef LOGIN_ACCOUNT_H /* account */
 struct account_interface *account;
 #endif // LOGIN_ACCOUNT_H
@@ -297,10 +294,6 @@ struct vending_interface *vending;
 
 HPExport const char *HPM_shared_symbols(int server_type)
 {
-#ifdef COMMON_UTILS_H /* HCache */
-	if ((server_type&(SERVER_TYPE_ALL)) != 0 && !HPM_SYMBOL("HCache", HCache))
-		return "HCache";
-#endif // COMMON_UTILS_H
 #ifdef LOGIN_ACCOUNT_H /* account */
 	if ((server_type&(SERVER_TYPE_LOGIN)) != 0 && !HPM_SYMBOL("account", account))
 		return "account";

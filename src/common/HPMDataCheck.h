@@ -301,11 +301,6 @@ HPExport const struct s_HPMDataCheck HPMDataCheck[] = {
 	#else
 		#define COMMON_TIMER_H
 	#endif // COMMON_TIMER_H
-	#ifdef COMMON_UTILS_H
-		{ "HCache_interface", sizeof(struct HCache_interface), SERVER_TYPE_ALL },
-	#else
-		#define COMMON_UTILS_H
-	#endif // COMMON_UTILS_H
 	#ifdef LOGIN_ACCOUNT_H
 		{ "Account_engine", sizeof(struct Account_engine), SERVER_TYPE_LOGIN },
 		{ "AccountDB", sizeof(struct AccountDB), SERVER_TYPE_LOGIN },

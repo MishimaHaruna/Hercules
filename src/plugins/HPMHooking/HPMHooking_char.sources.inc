@@ -25,7 +25,6 @@
 
 /* GENERATED FILE DO NOT EDIT */
 
-HPMHooks.source.HCache = *HCache;
 HPMHooks.source.chr = *chr;
 HPMHooks.source.cmdline = *cmdline;
 HPMHooks.source.console = *console;
