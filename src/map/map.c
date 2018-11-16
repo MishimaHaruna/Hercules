@@ -45,7 +45,6 @@
 #include "map/mapreg.h"
 #include "map/mercenary.h"
 #include "map/mob.h"
-#include "map/npc.h"
 #include "map/npc.h" // npc_setcells(), npc_unsetcells()
 #include "map/party.h"
 #include "map/path.h"
