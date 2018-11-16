@@ -222,19 +222,17 @@ static bool inter_homunculus_delete(int homun_id)
 
 static bool inter_homunculus_rename(const char *name)
 {
-	int i;
-
 	nullpo_ret(name);
 	// Check Authorized letters/symbols in the name of the homun
 	if( char_name_option == 1 )
 	{// only letters/symbols in char_name_letters are authorized
-		for( i = 0; i < NAME_LENGTH && name[i]; i++ )
+		for (int i = 0; i < NAME_LENGTH && name[i]; i++)
 			if( strchr(char_name_letters, name[i]) == NULL )
 				return false;
 	} else
 	if( char_name_option == 2 )
 	{// letters/symbols in char_name_letters are forbidden
-		for( i = 0; i < NAME_LENGTH && name[i]; i++ )
+		for (int i = 0; i < NAME_LENGTH && name[i]; i++)
 			if( strchr(char_name_letters, name[i]) != NULL )
 				return false;
 	}

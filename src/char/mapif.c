@@ -2291,7 +2291,6 @@ static int mapif_parse_NameChangeRequest(int fd)
 {
 	int account_id, char_id, type;
 	const char *name;
-	int i;
 
 	account_id = RFIFOL(fd, 2);
 	char_id = RFIFOL(fd, 6);
@@ -2300,13 +2299,13 @@ static int mapif_parse_NameChangeRequest(int fd)
 
 	// Check Authorized letters/symbols in the name
 	if (char_name_option == 1) { // only letters/symbols in char_name_letters are authorized
-		for (i = 0; i < NAME_LENGTH && name[i]; i++)
+		for (int i = 0; i < NAME_LENGTH && name[i]; i++)
 		if (strchr(char_name_letters, name[i]) == NULL) {
 			mapif->namechange_ack(fd, account_id, char_id, type, 0, name);
 			return 0;
 		}
 	} else if (char_name_option == 2) { // letters/symbols in char_name_letters are forbidden
-		for (i = 0; i < NAME_LENGTH && name[i]; i++)
+		for (int i = 0; i < NAME_LENGTH && name[i]; i++)
 		if (strchr(char_name_letters, name[i]) != NULL) {
 			mapif->namechange_ack(fd, account_id, char_id, type, 0, name);
 			return 0;

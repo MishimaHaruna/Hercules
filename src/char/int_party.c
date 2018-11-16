@@ -338,7 +338,6 @@ static int inter_party_check_empty(struct party_data *p)
 static struct party_data *inter_party_create(const char *name, int item, int item2, const struct party_member *leader)
 {
 	struct party_data *p;
-	int i;
 	nullpo_ret(name);
 	nullpo_ret(leader);
 
@@ -347,7 +346,7 @@ static struct party_data *inter_party_create(const char *name, int item, int ite
 	}
 	// Check Authorized letters/symbols in the name of the character
 	if (char_name_option == 1) { // only letters/symbols in char_name_letters are authorized
-		for (i = 0; i < NAME_LENGTH && name[i]; i++)
+		for (int i = 0; i < NAME_LENGTH && name[i]; i++) {
 			if (strchr(char_name_letters, name[i]) == NULL) {
 				if (name[i] == '"') { /* client-special-char */
 					char *newname = aStrndup(name, NAME_LENGTH-1);
@@ -359,11 +358,13 @@ static struct party_data *inter_party_create(const char *name, int item, int ite
 				}
 				return NULL;
 			}
+		}
 	} else if (char_name_option == 2) { // letters/symbols in char_name_letters are forbidden
-		for (i = 0; i < NAME_LENGTH && name[i]; i++)
+		for (int i = 0; i < NAME_LENGTH && name[i]; i++) {
 			if (strchr(char_name_letters, name[i]) != NULL) {
 				return NULL;
 			}
+		}
 	}
 
 	p = (struct party_data*)aCalloc(1, sizeof(struct party_data));

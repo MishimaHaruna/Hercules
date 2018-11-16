@@ -1615,8 +1615,6 @@ static bool char_name_exists(const char *name, const char *esc_name)
  */
 static int char_check_char_name(const char *name, const char *esc_name)
 {
-	int i;
-
 	nullpo_retr(-2, name);
 
 	// check length of character name
@@ -1646,13 +1644,13 @@ static int char_check_char_name(const char *name, const char *esc_name)
 	// Check Authorized letters/symbols in the name of the character
 	if( char_name_option == 1 )
 	{ // only letters/symbols in char_name_letters are authorized
-		for( i = 0; i < NAME_LENGTH && name[i]; i++ )
+		for (int i = 0; i < NAME_LENGTH && name[i]; i++)
 			if( strchr(char_name_letters, name[i]) == NULL )
 				return -2;
 	}
 	else if( char_name_option == 2 )
 	{ // letters/symbols in char_name_letters are forbidden
-		for( i = 0; i < NAME_LENGTH && name[i]; i++ )
+		for (int i = 0; i < NAME_LENGTH && name[i]; i++)
 			if( strchr(char_name_letters, name[i]) != NULL )
 				return -5;
 	}
