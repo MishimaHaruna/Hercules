@@ -1165,13 +1165,14 @@ static int mob_ai_sub_hard_activesearch(struct block_list *bl, va_list ap)
 				battle->check_range(&md->bl,bl,md->db->range2)
 			) { //Pick closest target?
 #ifdef ACTIVEPATHSEARCH
-			struct walkpath_data wpd;
-			if (!path->search(&wpd, &md->bl, md->bl.m, md->bl.x, md->bl.y, bl->x, bl->y, 0, CELL_CHKNOPASS)) // Count walk path cells
-				return 0;
-			//Standing monsters use range2, walking monsters use range3
-			if ((md->ud.walktimer == INVALID_TIMER && wpd.path_len > md->db->range2)
-				|| (md->ud.walktimer != INVALID_TIMER && wpd.path_len > md->db->range3))
-				return 0;
+				struct walkpath_data wpd;
+				if (!path->search(&wpd, &md->bl, md->bl.m, md->bl.x, md->bl.y, bl->x, bl->y, 0, CELL_CHKNOPASS)) // Count walk path cells
+					return 0;
+				bool is_standing = (md->ud.walktimer == INVALID_TIMER);
+				if ((is_standing && wpd.path_len > md->db->range2) // Standing monsters use range2, walking monsters use range3
+				 || (!is_standing && wpd.path_len > md->db->range3)) {
+					return 0;
+				}
 #endif
 				(*target) = bl;
 				md->target_id=bl->id;
@@ -2330,109 +2331,109 @@ static int mob_dead(struct mob_data *md, struct block_list *src, int type)
 		if(battle_config.mobs_level_up && md->level > md->db->lv) // [Valaris]
 			bonus += (md->level-md->db->lv)*battle_config.mobs_level_up_exp_rate;
 
-	for(i = 0; i < DAMAGELOG_SIZE && md->dmglog[i].id; i++) {
-		int flag=1,zeny=0;
-		unsigned int base_exp, job_exp;
-		double per; //Your share of the mob's exp
+		for(i = 0; i < DAMAGELOG_SIZE && md->dmglog[i].id; i++) {
+			int flag=1,zeny=0;
+			unsigned int base_exp, job_exp;
+			double per; //Your share of the mob's exp
 
-		if (!tmpsd[i]) continue;
+			if (!tmpsd[i]) continue;
 
-		if (!battle_config.exp_calc_type && md->tdmg)
-			//jAthena's exp formula based on total damage.
-			per = (double)md->dmglog[i].dmg/(double)md->tdmg;
-		else {
-			//eAthena's exp formula based on max hp.
-			per = (double)md->dmglog[i].dmg/(double)mstatus->max_hp;
-			if (per > 2) per = 2; // prevents unlimited exp gain
-		}
-
-		if (count>1 && battle_config.exp_bonus_attacker) {
-			//Exp bonus per additional attacker.
-			if (count > battle_config.exp_bonus_max_attacker)
-				count = battle_config.exp_bonus_max_attacker;
-			per += per*((count-1)*battle_config.exp_bonus_attacker)/100.;
-		}
-
-		// change experience for different sized monsters [Valaris]
-		if (battle_config.mob_size_influence) {
-			switch( md->special_state.size ) {
-				case SZ_MEDIUM:
-					per /= 2.;
-					break;
-				case SZ_BIG:
-					per *= 2.;
-					break;
+			if (!battle_config.exp_calc_type && md->tdmg)
+				//jAthena's exp formula based on total damage.
+				per = (double)md->dmglog[i].dmg/(double)md->tdmg;
+			else {
+				//eAthena's exp formula based on max hp.
+				per = (double)md->dmglog[i].dmg/(double)mstatus->max_hp;
+				if (per > 2) per = 2; // prevents unlimited exp gain
 			}
-		}
 
-		if( md->dmglog[i].flag == MDLF_PET )
-			per *= battle_config.pet_attack_exp_rate/100.;
+			if (count>1 && battle_config.exp_bonus_attacker) {
+				//Exp bonus per additional attacker.
+				if (count > battle_config.exp_bonus_max_attacker)
+					count = battle_config.exp_bonus_max_attacker;
+				per += per*((count-1)*battle_config.exp_bonus_attacker)/100.;
+			}
 
-		if(battle_config.zeny_from_mobs && md->level) {
-			 // zeny calculation moblv + random moblv [Valaris]
-			zeny=(int) ((md->level+rnd()%md->level)*per*bonus/100.);
-			if(md->db->mexp > 0)
-				zeny*=rnd()%250;
-		}
+			// change experience for different sized monsters [Valaris]
+			if (battle_config.mob_size_influence) {
+				switch( md->special_state.size ) {
+					case SZ_MEDIUM:
+						per /= 2.;
+						break;
+					case SZ_BIG:
+						per *= 2.;
+						break;
+				}
+			}
 
-		if (map->list[m].flag.nobaseexp || !md->db->base_exp)
-			base_exp = 0;
-		else
-			base_exp = (unsigned int)cap_value(md->db->base_exp * per * bonus/100. * map->list[m].bexp/100., 1, UINT_MAX);
+			if( md->dmglog[i].flag == MDLF_PET )
+				per *= battle_config.pet_attack_exp_rate/100.;
 
-		if (map->list[m].flag.nojobexp || !md->db->job_exp || md->dmglog[i].flag == MDLF_HOMUN) //Homun earned job-exp is always lost.
-			job_exp = 0;
-		else
-			job_exp = (unsigned int)cap_value(md->db->job_exp * per * bonus/100. * map->list[m].jexp/100., 1, UINT_MAX);
+			if(battle_config.zeny_from_mobs && md->level) {
+				 // zeny calculation moblv + random moblv [Valaris]
+				zeny=(int) ((md->level+rnd()%md->level)*per*bonus/100.);
+				if(md->db->mexp > 0)
+					zeny*=rnd()%250;
+			}
 
-		if ( (temp = tmpsd[i]->status.party_id) > 0 ) {
-			int j;
-			for( j = 0; j < pnum && pt[j].id != temp; j++ ); //Locate party.
+			if (map->list[m].flag.nobaseexp || !md->db->base_exp)
+				base_exp = 0;
+			else
+				base_exp = (unsigned int)cap_value(md->db->base_exp * per * bonus/100. * map->list[m].bexp/100., 1, UINT_MAX);
 
-			if( j == pnum ){ //Possibly add party.
-				pt[pnum].p = party->search(temp);
-				if(pt[pnum].p && pt[pnum].p->party.exp) {
-					pt[pnum].id = temp;
-					pt[pnum].base_exp = base_exp;
-					pt[pnum].job_exp = job_exp;
-					pt[pnum].zeny = zeny; // zeny share [Valaris]
-					pnum++;
+			if (map->list[m].flag.nojobexp || !md->db->job_exp || md->dmglog[i].flag == MDLF_HOMUN) //Homun earned job-exp is always lost.
+				job_exp = 0;
+			else
+				job_exp = (unsigned int)cap_value(md->db->job_exp * per * bonus/100. * map->list[m].jexp/100., 1, UINT_MAX);
+
+			if ( (temp = tmpsd[i]->status.party_id) > 0 ) {
+				int j;
+				for( j = 0; j < pnum && pt[j].id != temp; j++ ); //Locate party.
+
+				if( j == pnum ){ //Possibly add party.
+					pt[pnum].p = party->search(temp);
+					if(pt[pnum].p && pt[pnum].p->party.exp) {
+						pt[pnum].id = temp;
+						pt[pnum].base_exp = base_exp;
+						pt[pnum].job_exp = job_exp;
+						pt[pnum].zeny = zeny; // zeny share [Valaris]
+						pnum++;
+						flag=0;
+					}
+				} else {
+					//Add to total
+					if (pt[j].base_exp > UINT_MAX - base_exp)
+						pt[j].base_exp = UINT_MAX;
+					else
+						pt[j].base_exp += base_exp;
+
+					if (pt[j].job_exp > UINT_MAX - job_exp)
+						pt[j].job_exp = UINT_MAX;
+					else
+						pt[j].job_exp += job_exp;
+
+					pt[j].zeny+=zeny;  // zeny share [Valaris]
 					flag=0;
 				}
-			} else {
-				//Add to total
-				if (pt[j].base_exp > UINT_MAX - base_exp)
-					pt[j].base_exp = UINT_MAX;
-				else
-					pt[j].base_exp += base_exp;
-
-				if (pt[j].job_exp > UINT_MAX - job_exp)
-					pt[j].job_exp = UINT_MAX;
-				else
-					pt[j].job_exp += job_exp;
-
-				pt[j].zeny+=zeny;  // zeny share [Valaris]
-				flag=0;
 			}
-		}
-		if(base_exp && md->dmglog[i].flag == MDLF_HOMUN) //tmpsd[i] is null if it has no homunc.
-			homun->gainexp(tmpsd[i]->hd, base_exp);
-		if(flag) {
-			if(base_exp || job_exp) {
-				if( md->dmglog[i].flag != MDLF_PET || battle_config.pet_attack_exp_to_master ) {
-					pc->gainexp(tmpsd[i], &md->bl, base_exp, job_exp, false);
+			if(base_exp && md->dmglog[i].flag == MDLF_HOMUN) //tmpsd[i] is null if it has no homunc.
+				homun->gainexp(tmpsd[i]->hd, base_exp);
+			if(flag) {
+				if(base_exp || job_exp) {
+					if( md->dmglog[i].flag != MDLF_PET || battle_config.pet_attack_exp_to_master ) {
+						pc->gainexp(tmpsd[i], &md->bl, base_exp, job_exp, false);
+					}
 				}
+				if(zeny) // zeny from mobs [Valaris]
+					pc->getzeny(tmpsd[i], zeny, LOG_TYPE_PICKDROP_MONSTER, NULL);
+
+				if (!md->special_state.clone && !mob->is_clone(md->class_))
+					achievement->validate_mob_kill(tmpsd[i], md->db->mob_id); // Achievements [Smokexyz/Hercules]
 			}
-			if(zeny) // zeny from mobs [Valaris]
-				pc->getzeny(tmpsd[i], zeny, LOG_TYPE_PICKDROP_MONSTER, NULL);
-
-			if (!md->special_state.clone && !mob->is_clone(md->class_))
-				achievement->validate_mob_kill(tmpsd[i], md->db->mob_id); // Achievements [Smokexyz/Hercules]
 		}
-	}
 
-	for( i = 0; i < pnum; i++ ) //Party share.
-		party->exp_share(pt[i].p, &md->bl, pt[i].base_exp,pt[i].job_exp,pt[i].zeny);
+		for( i = 0; i < pnum; i++ ) //Party share.
+			party->exp_share(pt[i].p, &md->bl, pt[i].base_exp,pt[i].job_exp,pt[i].zeny);
 
 	} //End EXP giving.
 

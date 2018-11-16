@@ -7565,7 +7565,7 @@ static int status_change_start(struct block_list *src, struct block_list *bl, en
 	}
 
 	undead_flag = battle->check_undead(st->race, st->def_ele);
-	// Check for inmunities / sc fails
+	// Check for immunities / sc fails
 	switch (type) {
 		case SC_DRUMBATTLE:
 		case SC_NIBELUNGEN:

@@ -2984,7 +2984,7 @@ static int64 battle_calc_damage(struct block_list *src, struct block_list *bl, s
 		if (((sce=sc->data[SC_NJ_UTSUSEMI]) || sc->data[SC_NJ_BUNSINJYUTSU])
 		&& flag&BF_WEAPON && !(skill->get_nk(skill_id)&NK_NO_CARDFIX_ATK)) {
 
-			skill->additional_effect (src, bl, skill_id, skill_lv, flag, ATK_BLOCK, timer->gettick() );
+			skill->additional_effect(src, bl, skill_id, skill_lv, flag, ATK_BLOCK, timer->gettick());
 			if( !status->isdead(src) )
 				skill->counter_additional_effect( src, bl, skill_id, skill_lv, flag, timer->gettick() );
 			if (sce) {
