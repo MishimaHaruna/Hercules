@@ -1068,8 +1068,8 @@ static int skillnotok(uint16 skill_id, struct map_session_data *sd)
 			if( npc->isnear(&sd->bl) ) {
 				// uncomment for more verbose message.
 				//char output[150];
-				//sprintf(output, msg_txt(862), battle_config.min_npc_vendchat_distance); // "You're too close to a NPC, you must be at least %d cells away from any NPC."
-				//clif->message(sd->fd, output);
+				//sprintf(output, msg_sd(sd, 862), battle_config.min_npc_vendchat_distance); // "You're too close to a NPC, you must be at least %d cells away from any NPC."
+				//clif->messagecolor_self(sd->fd, COLOR_RED, output);
 				clif->skill_fail(sd, skill_id, USESKILL_FAIL_THERE_ARE_NPC_AROUND, 0, 0);
 				return 1;
 			}

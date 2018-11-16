@@ -6245,8 +6245,8 @@ ACMD(mobsearch)
 		return false;
 	}
 	if (mob_id == atoi(mob_name)) {
-		strcpy(mob_name,mob->db(mob_id)->jname); // DEFAULT_MOB_JNAME
-		//strcpy(mob_name,mob_db(mob_id)->name); // DEFAULT_MOB_NAME
+		strcpy(mob_name, mob->db(mob_id)->jname); // DEFAULT_MOB_JNAME
+		//strcpy(mob_name, mob->db(mob_id)->name); // DEFAULT_MOB_NAME
 	}
 
 	snprintf(atcmd_output, sizeof atcmd_output, msg_fd(fd,1220), mob_name, mapindex_id2name(sd->mapindex)); // Mob Search... %s %s
@@ -6941,8 +6941,8 @@ ACMD(showmobs)
 	}
 
 	if (mob_id == atoi(mob_name)) {
-		strcpy(mob_name,mob->db(mob_id)->jname); // DEFAULT_MOB_JNAME
-		//strcpy(mob_name,mob_db(mob_id)->name); // DEFAULT_MOB_NAME
+		strcpy(mob_name, mob->db(mob_id)->jname); // DEFAULT_MOB_JNAME
+		//strcpy(mob_name, mob->db(mob_id)->name); // DEFAULT_MOB_NAME
 	}
 
 	snprintf(atcmd_output, sizeof atcmd_output, msg_fd(fd,1252), // Mob Search... %s %s

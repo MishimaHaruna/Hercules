@@ -11551,8 +11551,8 @@ static void clif_parse_CreateChatRoom(int fd, struct map_session_data *sd)
 	if( npc->isnear(&sd->bl) ) {
 		// uncomment for more verbose message.
 		//char output[150];
-		//sprintf(output, msg_txt(862), battle_config.min_npc_vendchat_distance); // "You're too close to a NPC, you must be at least %d cells away from any NPC."
-		//clif_displaymessage(sd->fd, output);
+		//sprintf(output, msg_fd(fd, 862), battle_config.min_npc_vendchat_distance); // "You're too close to a NPC, you must be at least %d cells away from any NPC."
+		//clif->messagecolor_self(sd->fd, COLOR_RED, output);
 		clif->skill_fail(sd, 1, USESKILL_FAIL_THERE_ARE_NPC_AROUND, 0, 0);
 		return;
 	}
@@ -22113,7 +22113,7 @@ static int clif_parse(int fd)
 				if( sd ) {
 					fprintf(fp, "Unknown packet 0x%04X (length %d), %s session #%d, %d/%d (AID/CID)\n", cmd, packet_len, sd->state.active ? "authed" : "unauthed", fd, sd->status.account_id, sd->status.char_id);
 				} else {
-					fprintf(fp, "Unknown packet 0x%04X (length %d), session #%d\n", cmd, packet_len, fd);
+					fprintf(fp, "Unknown packet 0x%04X (length %d), session #%d\n", (unsigned int)cmd, packet_len, fd);
 				}
 
 				WriteDump(fp, RFIFOP(fd,0), packet_len);
@@ -22126,7 +22126,7 @@ static int clif_parse(int fd)
 				if( sd ) {
 					ShowDebug("Unknown packet 0x%04X (length %d), %s session #%d, %d/%d (AID/CID)\n", cmd, packet_len, sd->state.active ? "authed" : "unauthed", fd, sd->status.account_id, sd->status.char_id);
 				} else {
-					ShowDebug("Unknown packet 0x%04X (length %d), session #%d\n", cmd, packet_len, fd);
+					ShowDebug("Unknown packet 0x%04X (length %d), session #%d\n", (unsigned int)cmd, packet_len, fd);
 				}
 
 				ShowDump(RFIFOP(fd,0), packet_len);

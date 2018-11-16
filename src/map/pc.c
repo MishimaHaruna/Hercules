@@ -4975,7 +4975,7 @@ static int pc_isUseitem(struct map_session_data *sd, int n)
 
 	if ((item->item_usage.flag&INR_SITTING) && (pc_issit(sd) == 1) && (pc_get_group_level(sd) < item->item_usage.override)) {
 		clif->msgtable(sd, MSG_CANT_USE_WHEN_SITDOWN);
-		//clif->messagecolor_self(sd->fd, COLOR_WHITE, msg_txt(1474));
+		//clif->messagecolor_self(sd->fd, COLOR_WHITE, msg_sd(sd, 1474));
 		return 0; // You cannot use this item while sitting.
 	}
 
