@@ -659,7 +659,6 @@ struct stylist_data_entry {
 	int boxid;
 	bool allow_doram;
 };
-VECTOR_DECL(struct stylist_data_entry) stylist_data[MAX_STYLIST_TYPE];
 
 /**
 * Stylist Shop Responds
@@ -705,6 +704,7 @@ struct clif_interface {
 	struct eri *delayed_damage_ers;
 	/* */
 	VECTOR_DECL(struct attendance_entry) attendance_data;
+	VECTOR_DECL(struct stylist_data_entry) stylist_data[MAX_STYLIST_TYPE];
 	/* core */
 	int (*init) (bool minimal);
 	void (*final) (void);
