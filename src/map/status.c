@@ -2477,10 +2477,10 @@ static int status_calc_pc_(struct map_session_data *sd, enum e_status_calc_opt o
 	sd->regen.state.block = 0;
 
 	// zeroed arrays
-	memset(ZEROED_BLOCK_POS(sd), 0, ZEROED_BLOCK_SIZE(sd));
+	ZEROED_BLOCK_CLEAR(struct map_session_data, sd);
 
-	memset(ZEROED_BLOCK_POS(&(sd->right_weapon)), 0, ZEROED_BLOCK_SIZE(&(sd->right_weapon)));
-	memset(ZEROED_BLOCK_POS(&(sd->left_weapon)), 0, ZEROED_BLOCK_SIZE(&(sd->left_weapon)));
+	ZEROED_BLOCK_CLEAR(struct weapon_data, &sd->right_weapon);
+	ZEROED_BLOCK_CLEAR(struct weapon_data, &sd->left_weapon);
 
 	if (sd->special_state.intravision && !sd->sc.data[SC_CLAIRVOYANCE]) //Clear intravision as long as nothing else is using it
 		clif->sc_end(&sd->bl,sd->bl.id,SELF,SI_CLAIRVOYANCE);
@@ -13502,7 +13502,7 @@ void status_defaults(void)
 	status->current_equip_card_id = 0;    //To prevent card-stacking (from jA) [Skotlex]
 
 	// These macros are used instead of a sum of sizeof(), to ensure that padding won't interfere with our size, and code won't rot when adding more fields
-	memset(ZEROED_BLOCK_POS(status->dbs), 0, ZEROED_BLOCK_SIZE(status->dbs));
+	ZEROED_BLOCK_CLEAR(struct s_status_dbs, status->dbs);
 
 	status->data_ers = NULL;
 	memset(&status->dummy, 0, sizeof(status->dummy));

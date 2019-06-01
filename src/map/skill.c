@@ -21347,7 +21347,7 @@ static void skill_readdb(bool minimal)
 
 	/* when != it was called during init and this procedure was already performed by skill_defaults()  */
 	if( core->runflag == MAPSERVER_ST_RUNNING ) {
-		memset(ZEROED_BLOCK_POS(skill->dbs), 0, ZEROED_BLOCK_SIZE(skill->dbs));
+		ZEROED_BLOCK_CLEAR(struct s_skill_dbs, skill->dbs);
 	}
 
 	// load skill databases
@@ -21487,7 +21487,7 @@ void skill_defaults(void)
 	skill->cd_ers = NULL;
 	skill->cd_entry_ers = NULL;
 
-	memset(ZEROED_BLOCK_POS(skill->dbs), 0, ZEROED_BLOCK_SIZE(skill->dbs));
+	ZEROED_BLOCK_CLEAR(struct s_skill_dbs, skill->dbs);
 	memset(skill->dbs->unit_layout, 0, sizeof(skill->dbs->unit_layout));
 
 	/* */

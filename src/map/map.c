@@ -6811,7 +6811,7 @@ void map_defaults(void)
 	map->bl_list_size = 0;
 
 	//all in a big chunk, respects order
-	memset(ZEROED_BLOCK_POS(map), 0, ZEROED_BLOCK_SIZE(map));
+	ZEROED_BLOCK_CLEAR(struct map_interface, map);
 
 	map->cpsd = NULL;
 	map->list = NULL;

@@ -12459,7 +12459,7 @@ void pc_defaults(void)
 	pc->night_timer_tid = INVALID_TIMER;
 
 	// These macros are used instead of a sum of sizeof(), to ensure that padding won't interfere with our size, and code won't rot when adding more fields
-	memset(ZEROED_BLOCK_POS(pc), 0, ZEROED_BLOCK_SIZE(pc));
+	ZEROED_BLOCK_CLEAR(struct pc_interface, pc);
 
 	/* */
 	memcpy(pc->equip_pos, &equip_pos, sizeof(pc->equip_pos));

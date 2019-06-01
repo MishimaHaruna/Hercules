@@ -450,8 +450,14 @@ typedef char bool;
 /** Support macros for marking blocks to memset to 0 */
 #define BEGIN_ZEROED_BLOCK int8 HERC__zeroed_block_BEGIN
 #define END_ZEROED_BLOCK int8 HERC__zeroed_block_END
-#define ZEROED_BLOCK_POS(x) (&(x)->HERC__zeroed_block_BEGIN)
-#define ZEROED_BLOCK_SIZE(x) ((char*)&((x)->HERC__zeroed_block_END) - (char*)&((x)->HERC__zeroed_block_BEGIN) + sizeof((x)->HERC__zeroed_block_END))
+#define ZEROED_BLOCK_CLEAR(t, x) (\
+		(void)((x) - (t *)0), /* type check */ \
+		memset( \
+			(char *)(x) + offsetof(t, HERC__zeroed_block_BEGIN), /* block beginning */ \
+			0x00, \
+			(size_t)(offsetof(t, HERC__zeroed_block_END) - offsetof(t, HERC__zeroed_block_BEGIN) + sizeof((x)->HERC__zeroed_block_END)) /* block end */ \
+		) \
+	)
 
 /** Support macros for marking structs as unavailable */
 #define UNAVAILABLE_STRUCT int8 HERC__unavailable_struct
