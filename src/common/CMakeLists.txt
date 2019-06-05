@@ -1,5 +1,3 @@
-PROJECT(common)
-
 #FILE(GLOB HEADER_FILES *.h)
 #FILE(GLOB SOURCE_FILES *.c)
 SET(COMMON_SHARED_C
@@ -13,6 +11,7 @@ SET(COMMON_SHARED_C
 	md5calc.c
 	mutex.c
 	nullpo.c
+	packets.c
 	random.c
 	showmsg.c
 	strlib.c
@@ -28,12 +27,6 @@ SET(COMMON_C
 	socket.c
 	sql.c
 	)
-SET(COMMON_MINI_C
-	console.c
-	core.c
-	memmgr.c
-	socket.c
-	)
 
 ADD_LIBRARY(herculescore STATIC
 	${COMMON_SHARED_C}
@@ -41,14 +34,7 @@ ADD_LIBRARY(herculescore STATIC
 	$<TARGET_OBJECTS:config>
 	)
 
-ADD_LIBRARY(herculesminicore STATIC
-	${COMMON_SHARED_C}
-	${COMMON_MINI_C}
-	$<TARGET_OBJECTS:config>
-	)
-
 TARGET_LINK_LIBRARIES(herculescore mt19937ar ${MYSQL_LIBRARIES} ${ZLIB_LIBRARIES})
-TARGET_LINK_LIBRARIES(herculesminicore STATIC mt19937ar)
 
 SET(SYSINFO_PLATFORM ${CMAKE_SYSTEM_NAME})
 SET(SYSINFO_OSVERSION ${CMAKE_SYSTEM})
@@ -75,7 +61,7 @@ IF (CMAKE_SYSTEM_NAME STREQUAL "Linux")
 		EXECUTE_PROCESS(COMMAND ${CMD_LSB_RELEASE} "-d" OUTPUT_VARIABLE _lsb_desc OUTPUT_STRIP_TRAILING_WHITESPACE)
 		STRING(REGEX REPLACE "Description:\t" "" _lsb_desc ${_lsb_desc})
 		STRING(REGEX REPLACE "Enterprise Linux Enterprise Linux" "Oracle Linux" _lsb_desc ${_lsb_desc})
-	ENDIF(LSB_RELEASE)
+	ENDIF(CMD_LSB_RELEASE)
 
 	IF(_lsb_dist MATCHES "NAME=Gentoo" OR _lsb_dist STREQUAL "Gentoo")
 		SET(_lsb_dist "Gentoo")

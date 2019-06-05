@@ -1,5 +1,3 @@
-PROJECT(login-server)
-
 SET(LOGIN_H
 	account.h
 	HPMlogin.h
@@ -14,12 +12,12 @@ SET(LOGIN_P
 	)
 
 SET(LOGIN_C
-	account_sql.c
+	account.c
 	HPMlogin.c
-	ipban_sql.c
+	ipban.c
 	lclif.c
 	login.c
-	loginlog_sql.c
+	loginlog.c
 	)
 
 SOURCE_GROUP("Source Files" FILES ${LOGIN_C})

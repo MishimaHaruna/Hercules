@@ -17,12 +17,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0.2)
-PROJECT(Hercules C)
+PROJECT(Hercules LANGUAGES C)
 
 IF(NOT ${PROJECT_SOURCE_DIR} STREQUAL ${PROJECT_BINARY_DIR})
 	MESSAGE(FATAL_ERROR "Out-of-source builds are currently not supported. Please build Hercules inside the source directory.")
 ENDIF()
 
+SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 INCLUDE(CheckEpoll)
 INCLUDE(CheckIncludeFile)
