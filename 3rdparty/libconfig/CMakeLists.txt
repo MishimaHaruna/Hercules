@@ -1,4 +1,4 @@
-PROJECT(libconfig)
+PROJECT(libconfig C)
 
 CHECK_INCLUDE_FILE(xlocale.h HAVE_XLOCALE_H)
 

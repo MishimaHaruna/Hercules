@@ -8,8 +8,12 @@
 Thumbs.db
 
 # /
+/*.VC.db
+/*.VC.opendb
 /*.exe
+/*.exp
 /*.ilk
+/*.lib
 /*.log
 /*.ncb
 /*.opensdf
@@ -18,26 +22,26 @@ Thumbs.db
 /*.pid
 /*.sdf
 /*.stackdump
-/*.exp
-/*.lib
-/*.VC.db
-/*.VC.opendb
+/.ninja_deps
+/.ninja_log
 /.vs/
+/CMakeCache.txt
+/CMakeFiles
+/Makefile
+/Makefile.cache
 /autom4te.cache/
-/start-log.txt
+/build.ninja
 /char-server
+/cmake_install.cmake
 /config.log
 /config.status
 /core
 /ipch
 /login-server
-/CMakeCache.txt
-/CMakeFiles
-/cmake_install.cmake
-/Makefile
-/Makefile.cache
 /map-server
 /mapcache
+/rules.ninja
+/start-log.txt
 
 # /plugins -- everything
 /plugins/
@@ -52,15 +56,15 @@ Thumbs.db
 
 # /3rdparty/libconfig/
 /3rdparty/libconfig/CMakeFiles
-/3rdparty/libconfig/cmake_install.cmake
 /3rdparty/libconfig/Makefile
+/3rdparty/libconfig/cmake_install.cmake
 /3rdparty/libconfig/*.a
 /3rdparty/libconfig/*.o
 
 # /3rdparty/mt19937ar/
 /3rdparty/mt19937ar/CMakeFiles
-/3rdparty/mt19937ar/cmake_install.cmake
 /3rdparty/mt19937ar/Makefile
+/3rdparty/mt19937ar/cmake_install.cmake
 /3rdparty/mt19937ar/*.a
 /3rdparty/mt19937ar/*.o
 
@@ -76,13 +80,15 @@ Thumbs.db
 /log/*.leaks
 
 # /src/char/
+/src/char/CMakeFiles
 /src/char/Makefile
+/src/char/cmake_install.cmake
 /src/char/obj_sql
 
 # /src/common/
 /src/common/CMakeFiles
-/src/common/cmake_install.cmake
 /src/common/Makefile
+/src/common/cmake_install.cmake
 /src/common/obj_all
 /src/common/obj_all
 /src/common/obj_sql
@@ -91,14 +97,15 @@ Thumbs.db
 
 # /src/login/
 /src/login/CMakeFiles
-/src/login/cmake_install.cmake
 /src/login/Makefile
+/src/login/cmake_install.cmake
 /src/login/obj_sql
 
 # /src/map/
+/src/map/CMakeFiles
 /src/map/Makefile
+/src/map/cmake_install.cmake
 /src/map/obj_sql
-/src/map/pcre.h
 
 # /src/test/
 /src/test/Makefile
