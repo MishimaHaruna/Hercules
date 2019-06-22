@@ -46,6 +46,12 @@ Thumbs.db
 # /plugins -- everything
 /plugins/
 
+# /tests -- everything
+/tests/
+
+# /output -- everything
+/output/
+
 #OSX Xcode project user-sensitive-stuff
 /DerivedData
 /Hercules

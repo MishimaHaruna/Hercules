@@ -197,6 +197,18 @@ ELSE()
 	MESSAGE(FATAL_ERROR "Invalid profiler specified")
 ENDIF()
 
+# Coverage
+SET(HERCULES_TEST_COVERAGE FALSE CACHE BOOL "Enable test coverage reports, it also forces a debug build. (requires gcov/lcov)")
+IF(HERCULES_TEST_COVERAGE)
+	IF(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "AppleClang")
+		INCLUDE(CodeCoverage)
+		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 -coverage")
+		SETUP_TARGET_FOR_COVERAGE_GCOVR(coverage "ctest" "output/coverage/coverage" "--verbose")
+	ELSE()
+		MESSAGE(FATAL_ERROR "The gcov/lcov coverage is only available in GNU compilers")
+	ENDIF()
+ENDIF()
+
 FIND_PACKAGE(MySQL 5 REQUIRED)
 IF(MYSQL_FOUND)
 	INCLUDE_DIRECTORIES(${MYSQL_INCLUDE_DIRS})
@@ -239,6 +251,8 @@ ENDIF(WIN32)
 
 STRING(TIMESTAMP YEAR "%Y" UTC)
 
+ENABLE_TESTING()
+
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/3rdparty)
 
@@ -249,4 +263,4 @@ ADD_SUBDIRECTORY(src/login)
 ADD_SUBDIRECTORY(src/char)
 ADD_SUBDIRECTORY(src/map)
 ADD_SUBDIRECTORY(src/plugins)
-# ADD_SUBDIRECTORY(src/test)
+ADD_SUBDIRECTORY(src/test)
