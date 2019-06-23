@@ -45,6 +45,10 @@ FUNCTION(CREATE_TEST testname sources)
 	IF(HERCULES_TEST_COVERAGE)
 		ADD_DEPENDENCIES(coverage ${name})
 	ENDIF(HERCULES_TEST_COVERAGE)
+	
+	IF(HERCULES_SANITIZER_ENABLED)
+		add_sanitizers(${name})
+	ENDIF()
 ENDFUNCTION()
 
 CREATE_TEST(libconfig test_libconfig.c)

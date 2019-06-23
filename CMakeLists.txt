@@ -28,6 +28,13 @@ SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 INCLUDE(CheckEpoll)
 INCLUDE(CheckIncludeFile)
 
+# CMake 3.1 and higher include generator expressions of the form
+# $<TARGETLIB:obj> in the SOURCES property.  These need to be
+# stripped everywhere that access the SOURCES property, so we just
+# defer to the OLD behavior of not including generator expressions
+# in the output for now.
+cmake_policy(SET CMP0051 OLD)
+
 option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." FALSE)
 if (FORCE_COLORED_OUTPUT)
     if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
@@ -126,6 +133,24 @@ IF(HERCULES_PACKETVER_RE)
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DENABLE_PACKETVER_RE")
 ENDIF(HERCULES_PACKETVER_RE)
 
+# Packetver-Zero
+SET(HERCULES_PACKETVER_ZERO FALSE CACHE BOOL "Sets or unsets the PACKETVER_ZERO define - see src/common/mmo.h (currently disabled by default)")
+IF(HERCULES_PACKETVER_ZERO)
+	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPACKETVER_ZERO")
+ENDIF(HERCULES_PACKETVER_ZERO)
+
+# Packetver-Sak
+SET(HERCULES_PACKETVER_SAK FALSE CACHE BOOL "Sets or unsets the PACKETVER_SAK define - see src/common/mmo.h (currently disabled by default)")
+IF(HERCULES_PACKETVER_SAK)
+	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPACKETVER_SAK")
+ENDIF(HERCULES_PACKETVER_SAK)
+
+# Packetver-Ad
+SET(HERCULES_PACKETVER_AD FALSE CACHE BOOL "Sets or unsets the PACKETVER_AD define - see src/common/mmo.h (currently disabled by default)")
+IF(HERCULES_PACKETVER_AD)
+	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPACKETVER_AD")
+ENDIF(HERCULES_PACKETVER_AD)
+
 # Epoll
 SET(HERCULES_EPOLL FALSE CACHE BOOL "use epoll(4) on Linux")
 IF(HERCULES_EPOLL)
@@ -154,6 +179,14 @@ IF(HERCULES_KEY1 AND HERCULES_KEY2 AND HERCULES_KEY3)
 ELSEIF(HERCULES_KEY1 OR HERCULES_KEY2 OR HERCULES_KEY3)
 	MESSAGE(FATAL_ERROR "Missing obfuscation key(s). Either none or all three should be specified.")
 ENDIF()
+
+# Debug
+SET(HERCULES_DEBUG TRUE CACHE BOOL "Compiles extra debug code. please note it's meaningless for visual studio projects and similar IDE. (TRUE by default) (Boolean)")
+IF(HERCULES_DEBUG)
+	SET(CMAKE_BUILD_TYPE "Debug")
+ELSE()
+	SET(CMAKE_BUILD_TYPE "Release")
+ENDIF(HERCULES_DEBUG)
 
 # Buildbot
 SET(HERCULES_BUILDBOT FALSE CACHE BOOL "Enables buildbot-specific code")
@@ -196,6 +229,58 @@ IF(HERCULES_PROFILER)
 ELSE()
 	MESSAGE(FATAL_ERROR "Invalid profiler specified")
 ENDIF()
+
+# LTO
+SET(HERCULES_LTO FALSE CACHE BOOL "Enables or Disables Linktime Code Optimization (LTO is disabled by default)")
+IF(HERCULES_LTO)
+	IF(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "AppleClang")
+		add_compile_options(-flto -ffat-lto-objects -Werror)
+		SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -flto -ffat-lto-objects")
+		SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -flto -ffat-lto-objects")
+	ELSE()
+		message(FATAL_ERROR "The LTO build option is only available in GNU compilers")
+	ENDIF()
+ENDIF()
+
+# Sanitizer
+SET(HERCULES_SANITIZER_ENABLED FALSE INTERNAL)
+
+SET(HERCULES_ADDRESS_SANITIZER FALSE CACHE BOOL "Enables address sanitizer. (disabled by default)")
+IF(HERCULES_ADDRESS_SANITIZER)
+	FIND_PACKAGE(Sanitizers)
+	SET(SANITIZE_ADDRESS ON)
+	SET(HERCULES_SANITIZER_ENABLED TRUE)
+ENDIF(HERCULES_ADDRESS_SANITIZER)
+
+SET(HERCULES_MEMORY_SANITIZER FALSE CACHE BOOL "Enables memory sanitizer. (disabled by default)")
+IF(HERCULES_MEMORY_SANITIZER)
+	FIND_PACKAGE(Sanitizers)
+	SET(SANITIZE_MEMORY ON)
+	SET(HERCULES_SANITIZER_ENABLED TRUE)
+ENDIF(HERCULES_MEMORY_SANITIZER)
+
+SET(HERCULES_THREAD_SANITIZER FALSE CACHE BOOL "Enables thread sanitizer. (disabled by default)")
+IF(HERCULES_THREAD_SANITIZER)
+	FIND_PACKAGE(Sanitizers)
+	SET(SANITIZE_THREAD ON)
+	SET(HERCULES_SANITIZER_ENABLED TRUE)
+ENDIF(HERCULES_THREAD_SANITIZER)
+
+# Werror
+SET(HERCULES_WERROR FALSE CACHE BOOL "Enables -Werror in the compiler flags. (disabled by default)")
+IF(HERCULES_WERROR)
+	add_compile_options(-Werror)
+ENDIF()
+
+# Renewal
+SET(HERCULES_DISABLE_RENEWAL FALSE CACHE BOOL "Disable Ragnarok Renewal support (Boolean) (override settings in src/config/renewal.h)")
+IF(HERCULES_DISABLE_RENEWAL)
+	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DDISABLE_RENEWAL")
+ENDIF(HERCULES_DISABLE_RENEWAL)
+
+# maxconn
+SET(HERCULES_MAXCONN "16384" CACHE STRING "optionally set the maximum connections the core can handle (default: 16384) NOT USED YET - EXPERIMENTAL")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DMAXCONN=${HERCULES_MAXCONN}")
 
 # Coverage
 SET(HERCULES_TEST_COVERAGE FALSE CACHE BOOL "Enable test coverage reports, it also forces a debug build. (requires gcov/lcov)")
