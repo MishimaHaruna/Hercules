@@ -6,6 +6,7 @@
 .local.vimrc
 .ycm_extra_conf.py*
 Thumbs.db
+CTestTestfile.cmake
 
 # /
 /*.VC.db
@@ -114,7 +115,9 @@ Thumbs.db
 /src/map/obj_sql
 
 # /src/test/
+/src/test/CMakeFiles
 /src/test/Makefile
+/src/test/cmake_install.cmake
 /src/test/obj
 
 # /src/tool/
@@ -122,7 +125,9 @@ Thumbs.db
 /src/tool/obj_all
 
 # /src/plugins/
+/src/plugins/CMakeFiles
 /src/plugins/Makefile
+/src/plugins/cmake_install.cmake
 
 # /tools/
 /tools/convert
@@ -130,10 +135,17 @@ Thumbs.db
 /tools/*.exe
 /tools/*.ilk
 /tools/*.pdb
+/tools/HPMHookGen/CMakeFiles
 /tools/HPMHookGen/Makefile
+/tools/HPMHookGen/cmake_install.cmake
 /tools/HPMHookGen/doxyoutput
+/tools/doxygen/CMakeFiles
 /tools/doxygen/Makefile
+/tools/doxygen/cmake_install.cmake
 /tools/doxygen/docs
+
+# /Testing/
+/Testing/
 
 # /vcproj-*
 /vcproj-*/*.user
