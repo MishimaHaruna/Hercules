@@ -629,6 +629,7 @@ enum e_battle_config_idletime {
 struct delay_damage {
 	int src_id;
 	int target_id;
+	int target_m;
 	int64 damage;
 	int delay;
 	unsigned short distance;
