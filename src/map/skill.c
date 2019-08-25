@@ -11811,10 +11811,45 @@ static int skill_dance_overlap_sub(struct block_list *bl, va_list ap)
 	if (!(target->val2 & src->val2 & ~UF_ENSEMBLE)) //They don't match (song + dance) is valid.
 		return 0;
 
-	if (flag) //Set dissonance
+	if (flag != 0) {
+		// time to morph it into a new effect -- foreachincell calls must take place before setting it
+		if (target->dissonance_flag == 0) {
+			// we don't delete it when it is already set
+			map->foreachincell(skill->unit_effect, target->bl.m, target->bl.x, target->bl.y, target->group->bl_flag, &target->bl, timer->gettick(), 0x4);
+			target->dissonance_flag = 1;
+			clif->skill_delunit(target);
+		}
+
+		if (src->dissonance_flag != 2) {
+			// we don't delete it when it is already set
+			map->foreachincell(skill->unit_effect, src->bl.m, src->bl.x, src->bl.y, src->group->bl_flag, &src->bl, timer->gettick(), 0x4);
+			src->dissonance_flag = 2;
+			clif->skill_delunit(src);
+		}
+
+		target->dissonance_count++;
+		src->dissonance_count++;
 		target->val2 |= UF_ENSEMBLE; //Add ensemble to signal this unit is overlapping.
-	else //Remove dissonance
-		target->val2 &= ~UF_ENSEMBLE;
+	} else {
+		// time to revert it back
+
+		if (--target->dissonance_count == 0) {
+			target->val2 &= ~UF_ENSEMBLE;
+
+			if (target->dissonance_flag != 0) {
+				// we dont touch it when not set
+				target->dissonance_flag = 0;
+				clif->skill_delunit(target);
+				map->foreachincell(skill->unit_effect, target->bl.m, target->bl.x, target->bl.y, target->group->bl_flag, &target->bl, timer->gettick(), 0x1);
+			}
+		}
+
+		if (src->dissonance_flag != 0 && --src->dissonance_count == 0) {
+			src->dissonance_flag = 0;
+			clif->skill_delunit(src);
+			map->foreachincell(skill->unit_effect, src->bl.m, src->bl.x, src->bl.y, src->group->bl_flag, &src->bl, timer->gettick(), 0x1);
+		}
+	}
 
 	clif->getareachar_skillunit(&target->bl,target,AREA); //Update look of affected cell.
 
@@ -11857,8 +11892,10 @@ static bool skill_dance_switch(struct skill_unit *su, int flag)
 		return false;
 
 	// val2&UF_ENSEMBLE is a hack to indicate dissonance
-	if ( !(group->state.song_dance&0x1 && su->val2&UF_ENSEMBLE) )
-		return false;
+	if (!(group->state.song_dance&0x1 && su->val2&UF_ENSEMBLE)) {
+		if (su->dissonance_flag == 0)
+			return false;
+	}
 
 	if( flag == prevflag ) {
 		// protection against attempts to read an empty backup / write to a full backup

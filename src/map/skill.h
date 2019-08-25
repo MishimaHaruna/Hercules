@@ -1810,6 +1810,8 @@ struct skill_unit {
 	bool visible;
 	short alive,range;
 	int prev;
+	int8 dissonance_flag; // 0: none; 1: dissonance field; 2: remain invisible
+	short dissonance_count;
 };
 
 struct skill_unit_group_tickset {
