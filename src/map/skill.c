@@ -6876,7 +6876,7 @@ static int skill_castend_nodamage_id(struct block_list *src, struct block_list *
 		case MO_CALLSPIRITS:
 			if(sd) {
 				clif->skill_nodamage(src,bl,skill_id,skill_lv,1);
-				pc->addspiritball(sd, skill->get_time(skill_id, skill_lv), pc->getmaxspiritball(sd, 0));
+				pc->addspiritball(sd, skill->get_time(skill_id, skill_lv), pc->getmaxspiritball(sd, skill_lv));
 			}
 			break;
 
