@@ -18716,29 +18716,31 @@ static int skill_produce_mix(struct map_session_data *sd, uint16 skill_id, int n
 
 static int skill_arrow_create(struct map_session_data *sd, int nameid)
 {
-	int i,j,flag,index=-1;
 	struct item tmp_item;
 
 	nullpo_ret(sd);
 
-	if(nameid <= 0)
+	if (nameid <= 0)
 		return 1;
 
-	for(i=0;i<MAX_SKILL_ARROW_DB;i++)
-		if(nameid == skill->dbs->arrow_db[i].nameid) {
-			index = i;
-			break;
-		}
-
-	if(index < 0 || (j = pc->search_inventory(sd,nameid)) == INDEX_NOT_FOUND)
+	int db_idx = INDEX_NOT_FOUND;
+	ARR_FIND(0, MAX_SKILL_ARROW_DB, db_idx, nameid == skill->dbs->arrow_db[db_idx].nameid);
+	if (db_idx == MAX_SKILL_ARROW_DB)
 		return 1;
 
-	pc->delitem(sd, j, 1, 0, DELITEM_NORMAL, LOG_TYPE_PRODUCE); // FIXME: is this the correct reason flag?
-	for(i=0;i<MAX_ARROW_RESOURCE;i++) {
+	int inv_idx = INDEX_NOT_FOUND;
+	ARR_FIND(0, sd->status.inventorySize, inv_idx, sd->status.inventory[inv_idx].nameid == nameid
+			&& sd->status.inventory[inv_idx].amount > 0 && sd->status.inventory[inv_idx].equip == 0 && sd->status.inventory[inv_idx].identify != 0);
+	if (inv_idx == sd->status.inventorySize)
+		return 1;
+
+	pc->delitem(sd, inv_idx, 1, 0, DELITEM_NORMAL, LOG_TYPE_PRODUCE); // FIXME: is this the correct reason flag?
+	for (int i = 0; i < MAX_ARROW_RESOURCE; i++) {
+		int flag;
 		memset(&tmp_item,0,sizeof(tmp_item));
 		tmp_item.identify = 1;
-		tmp_item.nameid = skill->dbs->arrow_db[index].cre_id[i];
-		tmp_item.amount = skill->dbs->arrow_db[index].cre_amount[i];
+		tmp_item.nameid = skill->dbs->arrow_db[db_idx].cre_id[i];
+		tmp_item.amount = skill->dbs->arrow_db[db_idx].cre_amount[i];
 		if(battle_config.produce_item_name_input&0x4) {
 			tmp_item.card[0]=CARD0_CREATE;
 			tmp_item.card[1]=0;

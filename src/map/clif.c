@@ -3918,17 +3918,20 @@ static void clif_arrow_create_list(struct map_session_data *sd)
 
 	int c = 0;
 	for (int i = 0; i < MAX_SKILL_ARROW_DB; i++) {
-		int j;
-		if (skill->dbs->arrow_db[i].nameid > 0
-		 && (j = pc->search_inventory(sd, skill->dbs->arrow_db[i].nameid)) != INDEX_NOT_FOUND
-		 && !sd->status.inventory[j].equip && sd->status.inventory[j].identify
-		) {
-			if ((j = itemdb_viewid(skill->dbs->arrow_db[i].nameid)) > 0)
-				p->items[c].itemId = j;
-			else
-				p->items[c].itemId = skill->dbs->arrow_db[i].nameid;
-			c++;
-		}
+		if (skill->dbs->arrow_db[i].nameid == 0)
+			continue;
+
+		int j = 0;
+		ARR_FIND(0, sd->status.inventorySize, j, sd->status.inventory[j].nameid == skill->dbs->arrow_db[i].nameid
+				&& sd->status.inventory[j].amount > 0 && sd->status.inventory[j].equip == 0 && sd->status.inventory[j].identify != 0);
+		if (j == sd->status.inventorySize)
+			continue;
+
+		if ((j = itemdb_viewid(skill->dbs->arrow_db[i].nameid)) > 0)
+			p->items[c].itemId = j;
+		else
+			p->items[c].itemId = skill->dbs->arrow_db[i].nameid;
+		c++;
 	}
 	len = c * sizeof(struct PACKET_ZC_MAKINGARROW_LIST_sub) + sizeof(struct PACKET_ZC_MAKINGARROW_LIST);
 	p->packetLength = len;
