@@ -17834,6 +17834,22 @@ static int skill_unit_move_sub(struct block_list *bl, va_list ap)
 	if( su->group->interval != -1 && !(skill->get_unit_flag(skill_id)&UF_DUALMODE) && skill_id != BD_LULLABY ) { //Lullaby is the exception, bugreport:411
 		//Non-dualmode unit skills with a timer don't trigger when walking, so just return
 		if( dissonance ) skill->dance_switch(su, 1);
+
+		if (flag == 2 && skill_id != su->group->skill_id && (skill_id == BA_DISSONANCE || skill_id == DC_UGLYDANCE)) {
+			//  ^ Note: it has to be == 2 and not &2, because if its 3 (2|1) its onplace not onout
+			int result = skill->unit_onout(su, target, tick);
+			skill_id = su->group->skill_id; // revert it back (because earlier it was converted to dissonance)
+
+			if (result != 0) { // Store this unit id.
+				ARR_FIND(0, ARRAYLENGTH(skill->unit_temp), i, skill->unit_temp[i] == 0);
+				if (i < ARRAYLENGTH(skill->unit_temp)) {
+					skill->unit_temp[i] = skill_id;
+					return 1;
+				}
+				ShowError("skill_unit_move_sub: Reached limit of unit objects per cell!\n");
+			}
+		}
+
 		return 0;
 	}
 
