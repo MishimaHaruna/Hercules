@@ -214,19 +214,21 @@ static int pc_spiritball_timer(int tid, int64 tick, int id, intptr_t data)
  */
 static int pc_getmaxspiritball(struct map_session_data *sd, int min)
 {
-	int result;
+	int total;
 
 	nullpo_ret(sd);
 
-	result = pc->checkskill(sd, MO_CALLSPIRITS);
+	if ((sd->job & MAPID_BASEMASK) == MAPID_GUNSLINGER)
+		total = 10;
+	else
+		total = pc->checkskill(sd, MO_CALLSPIRITS);
 
-	if ( min && result < min )
-		result = min;
-	else if ( sd->sc.data[SC_RAISINGDRAGON] )
-		result += sd->sc.data[SC_RAISINGDRAGON]->val1;
-	if ( result > MAX_SPIRITBALL )
-		result = MAX_SPIRITBALL;
-	return result;
+	if (min > 0 && total < min)
+		total = min;
+	else if (sd->sc.data[SC_RAISINGDRAGON])
+		total += sd->sc.data[SC_RAISINGDRAGON]->val1;
+
+	return min(total, MAX_SPIRITBALL);
 }
 
 static int pc_addspiritball(struct map_session_data *sd, int interval, int max)
