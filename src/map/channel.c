@@ -322,6 +322,10 @@ static void channel_join_sub(struct channel_data *chan, struct map_session_data 
 	VECTOR_ENSURE(sd->channels, 1, 1);
 	VECTOR_PUSH(sd->channels, chan);
 
+	if (chan->type == HCS_TYPE_MAP) {
+		sd->state.map_channel_parted = 0;
+	}
+
 	if (!stealth && (chan->options&HCS_OPT_ANNOUNCE_JOIN)) {
 		char message[60];
 		sprintf(message, msg_txt(897), chan->name, sd->status.name); // #%s '%s' joined

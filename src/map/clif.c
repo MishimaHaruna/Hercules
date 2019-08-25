@@ -10791,7 +10791,9 @@ static void clif_parse_LoadEndAck(int fd, struct map_session_data *sd)
 		sd->state.changemap = false;
 
 		if (channel->config->local && channel->config->local_autojoin) {
-			channel->map_join(sd);
+			if (sd->state.map_channel_parted == 0) {
+				channel->map_join(sd);
+			}
 		}
 		if (channel->config->irc && channel->config->irc_autojoin) {
 			channel->irc_join(sd);

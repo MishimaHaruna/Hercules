@@ -9263,6 +9263,9 @@ ACMD(channel)
 			clif->message(fd, atcmd_output);
 			return false;
 		}
+		if (VECTOR_INDEX(sd->channels, k)->type == HCS_TYPE_MAP) {
+			sd->state.map_channel_parted = 1;
+		}
 		if (VECTOR_INDEX(sd->channels, k)->type == HCS_TYPE_ALLY) {
 			for (k = VECTOR_LENGTH(sd->channels) - 1; k >= 0; k--) {
 				// Loop downward to avoid issues when channel->leave() compacts the array
