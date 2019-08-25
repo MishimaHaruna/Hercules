@@ -181,6 +181,9 @@ static void activate_pcreset(struct npc_data *nd, int setid)
 	if (pcreset->next != NULL)
 		pcreset->next->prev = pcreset;
 	npcParse->active = pcreset;
+
+	if (nd->bl.m >= 0)
+		map->list[nd->bl.m].npc_active_pcre_sets++;
 }
 
 /**
@@ -221,6 +224,14 @@ static void deactivate_pcreset(struct npc_data *nd, int setid)
 	if (pcreset->next != NULL)
 		pcreset->next->prev = pcreset;
 	npcParse->inactive = pcreset;
+
+	if (nd->bl.m >= 0) {
+		map->list[nd->bl.m].npc_active_pcre_sets--;
+		if (map->list[nd->bl.m].npc_active_pcre_sets < 0) {
+			Assert_report(map->list[nd->bl.m].npc_active_pcre_sets >= 0);
+			map->list[nd->bl.m].npc_active_pcre_sets = 0;
+		}
+	}
 }
 
 /**
@@ -273,6 +284,14 @@ static void delete_pcreset(struct npc_data *nd, int setid)
 		pcreset->head = n;
 	}
 	aFree(pcreset);
+
+	if (active && nd->bl.m >= 0) {
+		map->list[nd->bl.m].npc_active_pcre_sets--;
+		if (map->list[nd->bl.m].npc_active_pcre_sets < 0) {
+			Assert_report(map->list[nd->bl.m].npc_active_pcre_sets >= 0);
+			map->list[nd->bl.m].npc_active_pcre_sets = 0;
+		}
+	}
 }
 
 /**

@@ -11296,7 +11296,9 @@ static void clif_parse_GlobalMessage(int fd, struct map_session_data *sd)
 	logs->chat(LOG_CHAT_GLOBAL, 0, sd->status.char_id, sd->status.account_id, mapindex_id2name(sd->mapindex), sd->bl.x, sd->bl.y, NULL, message);
 
 	// trigger listening npcs
-	map->foreachinrange(npc_chat->sub, &sd->bl, AREA_SIZE, BL_NPC, full_message, strlen(full_message), &sd->bl);
+	if (sd->bl.m >= 0 && map->list[sd->bl.m].npc_active_pcre_sets > 0) {
+		map->foreachinrange(npc_chat->sub, &sd->bl, AREA_SIZE, BL_NPC, full_message, strlen(full_message), &sd->bl);
+	}
 }
 
 static void clif_parse_MapMove(int fd, struct map_session_data *sd) __attribute__((nonnull (2)));

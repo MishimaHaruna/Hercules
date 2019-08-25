@@ -260,6 +260,7 @@ static int instance_add_map(const char *name, int instance_id, bool usebasename,
 
 	memset(map->list[im].npc, 0x00, sizeof(map->list[i].npc));
 	map->list[im].npc_num = 0;
+	map->list[im].npc_active_pcre_sets = 0;
 
 	memset(map->list[im].moblist, 0x00, sizeof(map->list[im].moblist));
 	map->list[im].mob_delete_timer = INVALID_TIMER;

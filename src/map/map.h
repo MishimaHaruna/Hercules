@@ -849,6 +849,7 @@ struct map_data {
 
 	/* speeds up clif_updatestatus processing by causing hpmeter to run only when someone with the permission can view it */
 	unsigned short hpmeter_visible;
+	int npc_active_pcre_sets;
 	struct hplugin_data_store *hdata; ///< HPM Plugin Data Store
 };
 
