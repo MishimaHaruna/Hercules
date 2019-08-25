@@ -5407,6 +5407,25 @@ static bool map_zone_mf_cache(int m, char *flag, char *params)
 
 	return false;
 }
+
+// subfunction to use when GvG starts in a map, so the restrictions are applied when the map flags are set [Mathy]
+static int map_zone_apply_restrictions(struct block_list *bl, va_list ap)
+{
+	struct map_session_data *sd = BL_CAST(BL_PC, bl);
+	nullpo_ret(sd);
+
+	if (sd->pd) {
+		if (battle_config.pet_no_gvg && map_flag_gvg(sd->bl.m)) { //Return the pet to the egg [Skotlex]
+			clif->message(sd->fd, msg_sd(sd,866)); // "Pets are not allowed in Guild Wars."
+			pet->menu(sd, 3); //Option 3 is return to egg.
+		}
+	}
+
+	pc->checkitem(sd);
+
+	return 1;
+}
+
 static void map_zone_apply(int m, struct map_zone_data *zone, const char *start, const char *buffer, const char *filepath)
 {
 	int i;
@@ -5433,6 +5452,8 @@ static void map_zone_apply(int m, struct map_zone_data *zone, const char *start,
 
 		npc->parse_mapflag(map->list[m].name, empty, flag, params, start, buffer, filepath, NULL);
 	}
+
+	map->foreachinmap(map->zone_apply_restrictions, m, BL_PC); // apply equipment and pet restrictions to every character on that map
 }
 /* used on npc load and reload to apply all "Normal" and "PK Mode" zones */
 static void map_zone_init(void)
@@ -6852,6 +6873,7 @@ PRAGMA_GCC9(GCC diagnostic pop)
 	map->zone_init = map_zone_init;
 	map->zone_remove = map_zone_remove;
 	map->zone_remove_all = map_zone_remove_all;
+	map->zone_apply_restrictions = map_zone_apply_restrictions;
 	map->zone_apply = map_zone_apply;
 	map->zone_change = map_zone_change;
 	map->zone_change2 = map_zone_change2;
