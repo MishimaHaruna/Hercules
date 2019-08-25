@@ -12379,7 +12379,7 @@ static struct skill_unit_group *skill_unitsetting(struct block_list *src, uint16
 		val1 = skill_lv;
 		val2 = 0;
 
-		if (!group->state.song_dance && !map->getcell(src->m, src, ux, uy, CELL_CHKREACH))
+		if (!(group->state.song_dance || group->state.guildaura) && !map->getcell(src->m, src, ux, uy, CELL_CHKREACH))
 			continue; // don't place skill units on walls (except for songs/dances/encores)
 		if( battle_config.skill_wall_check && skill->get_unit_flag(skill_id)&UF_PATHCHECK && !path->search_long(NULL,src,src->m,ux,uy,x,y,CELL_CHKWALL) )
 			continue; // no path between cell and center of casting.
