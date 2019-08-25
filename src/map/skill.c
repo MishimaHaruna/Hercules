@@ -2672,6 +2672,17 @@ static int skill_blown(struct block_list *src, struct block_list *target, int co
 			break;
 	}
 
+	switch (src->type) {
+		case BL_SKILL:
+		{
+			const struct skill_unit *su = BL_UCCAST(BL_SKILL, src);
+			if (dir == -1 && su->group != NULL && su->group->skill_id == WZ_STORMGUST) {
+				dir = su->val2;
+			}
+		}
+			break;
+	}
+
 	if (dir == -1) // <optimized>: do the computation here instead of outside
 		dir = map->calc_dir(target, src->x, src->y); // direction from src to target, reversed
 
@@ -12439,6 +12450,10 @@ static struct skill_unit_group *skill_unitsetting(struct block_list *src, uint16
 			//Double duration of cells on top of Deluge/Suiton
 			su->limit *= 2;
 			group->limit = su->limit;
+		}
+
+		if (skill_id == WZ_STORMGUST) {
+			su->val2 = map->calc_dir(&su->bl, x, y);
 		}
 
 		// execute on all targets standing on this cell
