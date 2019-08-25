@@ -1673,7 +1673,7 @@ static int skill_additional_effect(struct block_list *src, struct block_list *bl
 				sc_start(src,bl,SC_STUN,70,skill_lv,skill->get_time2(skill_id,skill_lv));
 			break;
 		case GS_BULLSEYE: //0.1% coma rate.
-			if(tstatus->race == RC_BRUTE || tstatus->race == RC_DEMIHUMAN)
+			if (tstatus->race == RC_BRUTE || (tstatus->race & RCMASK_DEMIPLAYER) != 0x0)
 				status->change_start(src,bl,SC_COMA,10,skill_lv,0,src->id,0,0,SCFLAG_NONE);
 			break;
 		case GS_PIERCINGSHOT:

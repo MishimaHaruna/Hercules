@@ -2189,7 +2189,7 @@ static int battle_calc_skillratio(int attack_type, struct block_list *src, struc
 					break;
 				case GS_BULLSEYE:
 					//Only works well against brute/demi-humans non bosses.
-					if((tst->race == RC_BRUTE || tst->race == RC_DEMIHUMAN)
+					if ((tst->race == RC_BRUTE || (tst->race & RCMASK_DEMIPLAYER) != 0x0)
 						&& !(tst->mode&MD_BOSS))
 						skillratio += 400;
 					break;
