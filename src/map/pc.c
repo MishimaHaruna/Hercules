@@ -1734,6 +1734,18 @@ static int pc_calc_skilltree(struct map_session_data *sd)
 
 	pc->calc_skilltree_bonus(sd, classidx);
 
+	// Remove all SCs that can't be inactivated without a skill
+	if (sd->sc.data[SC_STORMKICK_READY] != NULL && pc->checkskill(sd, TK_READYSTORM) < 1)
+		status_change_end(&sd->bl, SC_STORMKICK_READY, INVALID_TIMER);
+	if (sd->sc.data[SC_DOWNKICK_READY] != NULL && pc->checkskill(sd, TK_READYDOWN) < 1)
+		status_change_end(&sd->bl, SC_DOWNKICK_READY, INVALID_TIMER);
+	if (sd->sc.data[SC_TURNKICK_READY] != NULL && pc->checkskill(sd, TK_READYTURN) < 1)
+		status_change_end(&sd->bl, SC_TURNKICK_READY, INVALID_TIMER);
+	if (sd->sc.data[SC_COUNTERKICK_READY] != NULL && pc->checkskill(sd, TK_READYCOUNTER) < 1)
+		status_change_end(&sd->bl, SC_COUNTERKICK_READY, INVALID_TIMER);
+	if (sd->sc.data[SC_DODGE_READY] != NULL && pc->checkskill(sd, TK_DODGE) < 1)
+		status_change_end(&sd->bl, SC_DODGE_READY, INVALID_TIMER);
+
 	return 0;
 }
 
