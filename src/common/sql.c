@@ -693,7 +693,7 @@ static int SqlStmt_BindParam(struct SqlStmt *self, size_t idx, enum SqlDataType 
 		if( self->max_params < count )
 		{
 			self->max_params = count;
-			RECREATE(self->params, MYSQL_BIND, count);
+			self->params = aRealloc(self->params, count * sizeof(MYSQL_BIND));
 		}
 		memset(self->params, 0, count*sizeof(MYSQL_BIND));
 		for( i = 0; i < count; ++i )
@@ -780,8 +780,8 @@ static int SqlStmt_BindColumn(struct SqlStmt *self, size_t idx, enum SqlDataType
 		if( self->max_columns < cols )
 		{
 			self->max_columns = cols;
-			RECREATE(self->columns, MYSQL_BIND, cols);
-			RECREATE(self->column_lengths, s_column_length, cols);
+			self->columns = aRealloc(self->columns, cols * sizeof(MYSQL_BIND));
+			self->column_lengths = aRealloc(self->column_lengths, cols * sizeof(s_column_length));
 		}
 		memset(self->columns, 0, cols*sizeof(MYSQL_BIND));
 		memset(self->column_lengths, 0, cols*sizeof(s_column_length));
