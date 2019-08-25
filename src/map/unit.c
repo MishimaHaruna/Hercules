@@ -2366,6 +2366,7 @@ static void unit_init_ud(struct unit_data *ud)
 	ud->attackabletime =
 	ud->canact_tick    =
 	ud->canmove_tick   = timer->gettick();
+	VECTOR_INIT(ud->skillunittick);
 }
 
 /*==========================================
@@ -2944,6 +2945,7 @@ static int unit_free(struct block_list *bl, enum clr_type clrtype)
 
 	skill->clear_unitgroup(bl);
 	status->change_clear(bl,1);
+	VECTOR_CLEAR(ud->skillunittick);
 	map->deliddb(bl);
 	if( bl->type != BL_PC ) //Players are handled by map_quit
 		map->freeblock(bl);

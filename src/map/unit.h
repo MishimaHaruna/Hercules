@@ -48,7 +48,7 @@ struct unit_data {
 	struct walkpath_data walkpath;
 	struct skill_timerskill *skilltimerskill[MAX_SKILLTIMERSKILL];
 	struct skill_unit_group *skillunit[MAX_SKILLUNITGROUP];
-	struct skill_unit_group_tickset skillunittick[MAX_SKILLUNITGROUPTICKSET];
+	VECTOR_DECL(struct skill_unit_group_tickset) skillunittick;
 	short attacktarget_lv;
 	short to_x,to_y;
 	short skillx,skilly;

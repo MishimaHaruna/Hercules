@@ -12825,6 +12825,11 @@ static int skill_unit_onplace_timer(struct skill_unit *src, struct block_list *b
 
 	if ((ts = skill->unitgrouptickset_search(bl,sg,tick))) {
 		//Not all have it, eg: Traps don't have it even though they can be hit by Heaven's Drive [Skotlex]
+
+		// see unitgrouptickset_search, we use id == 0 to signal the capacity has been reached, and this skill should not be processed
+		if (ts->id == 0)
+			return 0;
+
 		diff = DIFF_TICK32(tick,ts->tick);
 		if (diff < 0)
 			return 0;
@@ -17513,41 +17518,46 @@ static int skill_clear_unitgroup(struct block_list *src)
  *------------------------------------------*/
 static struct skill_unit_group_tickset *skill_unitgrouptickset_search(struct block_list *bl, struct skill_unit_group *group, int64 tick)
 {
-	int i,j=-1,s,id;
+	int id;
 	struct unit_data *ud;
-	struct skill_unit_group_tickset *set;
+	struct skill_unit_group_tickset *new_ts = NULL;
+	static struct skill_unit_group_tickset dummy = { 0 };
 
 	nullpo_ret(bl);
 	nullpo_ret(group);
-	if (group->interval==-1)
+	if (group->interval == -1)
 		return NULL;
 
 	ud = unit->bl2ud(bl);
-	if (!ud) return NULL;
+	if (ud == NULL)
+		return NULL;
 
-	set = ud->skillunittick;
-
-	if (skill->get_unit_flag(group->skill_id)&UF_NOOVERLAP)
-		id = s = group->skill_id;
+	if ((skill->get_unit_flag(group->skill_id) & UF_NOOVERLAP) != 0)
+		id = group->skill_id;
 	else
-		id = s = group->group_id;
+		id = group->group_id;
 
-	for (i=0; i<MAX_SKILLUNITGROUPTICKSET; i++) {
-		int k = (i+s) % MAX_SKILLUNITGROUPTICKSET;
-		if (set[k].id == id)
-			return &set[k];
-		else if (j==-1 && (DIFF_TICK(tick,set[k].tick)>0 || set[k].id==0))
-			j=k;
+	for (int i = 0; i < VECTOR_LENGTH(ud->skillunittick); i++) {
+		struct skill_unit_group_tickset *ts = &VECTOR_INDEX(ud->skillunittick, i);
+
+		if (ts->id == id)
+			return ts;
+		if (new_ts == NULL && (ts->id == 0 || DIFF_TICK(tick, ts->tick) > 0))
+			new_ts = ts;
+	}
+	if (new_ts == NULL) {
+		if (VECTOR_LENGTH(ud->skillunittick) >= 125) {
+			ShowWarning ("skill_unitgrouptickset_search: tickset is full. (failed for skill '%s' on unit %u)\n", skill->get_name(group->skill_id), bl->type);
+			return &dummy;
+		}
+		VECTOR_ENSURE(ud->skillunittick, 1, 5);
+		VECTOR_PUSHZEROED(ud->skillunittick);
+		new_ts = &VECTOR_LAST(ud->skillunittick);
 	}
 
-	if (j == -1) {
-		ShowWarning ("skill_unitgrouptickset_search: tickset is full. ( failed for skill '%s' on unit %u )\n", skill->get_name(group->skill_id), bl->type);
-		j = id % MAX_SKILLUNITGROUPTICKSET;
-	}
-
-	set[j].id = id;
-	set[j].tick = tick;
-	return &set[j];
+	new_ts->id = id;
+	new_ts->tick = tick;
+	return new_ts;
 }
 
 /*==========================================
