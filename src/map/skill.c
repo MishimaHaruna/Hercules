@@ -7866,6 +7866,8 @@ static int skill_castend_nodamage_id(struct block_list *src, struct block_list *
 					if(sp < 1) sp = 1;
 					status->heal(bl, 0, sp, STATUS_HEAL_SHOWEFFECT);
 					status_percent_damage(bl, src, 0, -20, false); //20% max SP damage.
+					if (battle->bc->magicrod_type == 1)
+						clif->skill_nodamage(bl, bl, SA_MAGICROD, tsc->data[SC_MAGICROD]->val1, 1);
 				} else {
 					struct unit_data *ud = unit->bl2ud(bl);
 					int bl_skill_id=0,bl_skill_lv=0,hp = 0;
