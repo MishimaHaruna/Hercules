@@ -6652,7 +6652,7 @@ static void clif_item_repair_list(struct map_session_data *sd, struct map_sessio
 	p->packetType = 0x1fc;
 	for (i = c = 0; i < sd->status.inventorySize; i++) {
 		int nameid = dstsd->status.inventory[i].nameid;
-		if (nameid > 0 && (dstsd->status.inventory[i].attribute & ATTR_BROKEN) != 0) { // && skill_can_repair(sd,nameid)) {
+		if (nameid > 0 && (dstsd->status.inventory[i].attribute & ATTR_BROKEN) != 0 && dstsd->status.inventory[i].card[0] != CARD0_PET) { // && skill_can_repair(sd,nameid)) {
 			p->items[c].index = i;
 			p->items[c].itemId = nameid;
 			p->items[c].refine = dstsd->status.inventory[i].refine;
