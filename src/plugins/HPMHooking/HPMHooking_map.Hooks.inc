@@ -46035,6 +46035,39 @@ void HP_map_zone_remove_all(int m) {
 	}
 	return;
 }
+int HP_map_zone_apply_restrictions(struct block_list *bl, va_list ap) {
+	int hIndex = 0;
+	int retVal___ = 0;
+	if (HPMHooks.count.HP_map_zone_apply_restrictions_pre > 0) {
+		int (*preHookFunc) (struct block_list **bl, va_list ap);
+		*HPMforce_return = false;
+		for (hIndex = 0; hIndex < HPMHooks.count.HP_map_zone_apply_restrictions_pre; hIndex++) {
+			va_list ap___copy; va_copy(ap___copy, ap);
+			preHookFunc = HPMHooks.list.HP_map_zone_apply_restrictions_pre[hIndex].func;
+			retVal___ = preHookFunc(&bl, ap___copy);
+			va_end(ap___copy);
+		}
+		if (*HPMforce_return) {
+			*HPMforce_return = false;
+			return retVal___;
+		}
+	}
+	{
+		va_list ap___copy; va_copy(ap___copy, ap);
+		retVal___ = HPMHooks.source.map.zone_apply_restrictions(bl, ap___copy);
+		va_end(ap___copy);
+	}
+	if (HPMHooks.count.HP_map_zone_apply_restrictions_post > 0) {
+		int (*postHookFunc) (int retVal___, struct block_list *bl, va_list ap);
+		for (hIndex = 0; hIndex < HPMHooks.count.HP_map_zone_apply_restrictions_post; hIndex++) {
+			va_list ap___copy; va_copy(ap___copy, ap);
+			postHookFunc = HPMHooks.list.HP_map_zone_apply_restrictions_post[hIndex].func;
+			retVal___ = postHookFunc(retVal___, bl, ap___copy);
+			va_end(ap___copy);
+		}
+	}
+	return retVal___;
+}
 void HP_map_zone_apply(int m, struct map_zone_data *zone, const char *start, const char *buffer, const char *filepath) {
 	int hIndex = 0;
 	if (HPMHooks.count.HP_map_zone_apply_pre > 0) {
