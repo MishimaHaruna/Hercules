@@ -265,18 +265,13 @@ typedef uintptr_t uintptr;
 #define strcasecmp  stricmp
 #define strncasecmp strnicmp
 #define strncmpi    strnicmp
-#if _MSC_VER < 1900
-#define snprintf    _snprintf
-#endif
+#define strtoull    _strtoui64
+#define strtoll     _strtoi64
 #else
 #define strcmpi     strcasecmp
 #define stricmp     strcasecmp
 #define strncmpi    strncasecmp
 #define strnicmp    strncasecmp
-#endif
-#if defined(_MSC_VER)
-#define strtoull    _strtoui64
-#define strtoll     _strtoi64
 #endif
 
 // keyword replacement
@@ -364,15 +359,7 @@ typedef uintptr_t uintptr;
 #endif // ! defined(__GNUC__) && (GCC_VERSION >= 70000)
 
 // boolean types for C
-#if !defined(__MINGW32__) && !defined(MINGW)
-#if !defined(_MSC_VER) || _MSC_VER >= 1800
-// MSVC doesn't have stdbool.h yet as of Visual Studio 2012 (MSVC version 17.00)
-// but it will support it in Visual Studio 2013 (MSVC version 18.00)
-// http://blogs.msdn.com/b/vcblog/archive/2013/07/19/c99-library-support-in-visual-studio-2013.aspx
-// GCC and Clang are assumed to be C99 compliant
 #include <stdbool.h> // bool, true, false, __bool_true_false_are_defined
-#endif // ! defined(_MSC_VER) || _MSC_VER >= 1800
-#endif  // !defined(__MINGW32__) && !defined(MINGW)
 
 #ifndef __bool_true_false_are_defined
 // If stdbool.h is not available or does not define this
@@ -414,16 +401,11 @@ typedef char bool;
 
 //////////////////////////////////////////////////////////////////////////
 // Additional printf specifiers
-#if defined(_MSC_VER)
-#define PRIS_PREFIX "I"
-#else // gcc
-#define PRIS_PREFIX "z"
-#endif
-#define PRIdS PRIS_PREFIX "d"
-#define PRIxS PRIS_PREFIX "x"
-#define PRIuS PRIS_PREFIX "u"
-#define PRIXS PRIS_PREFIX "X"
-#define PRIoS PRIS_PREFIX "o"
+#define PRIdS "zd"
+#define PRIxS "zx"
+#define PRIuS "zu"
+#define PRIXS "zX"
+#define PRIoS "zo"
 
 //////////////////////////////////////////////////////////////////////////
 // path separator
