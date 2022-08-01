@@ -11171,7 +11171,7 @@ static void atcommand_db_load_groups(GroupSettings **groups, struct config_setti
 
 			idx = pcg->get_idx(group);
 			if (idx < 0 || idx >= sz) {
-				ShowError("atcommand_db_load_groups: index (%d) out of bounds [0,%"PRIuS"]\n", idx, sz - 1);
+				ShowError("atcommand_db_load_groups: index (%d) out of bounds [0,%zu]\n", idx, sz - 1);
 				continue;
 			}
 

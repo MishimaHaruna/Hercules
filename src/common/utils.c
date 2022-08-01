@@ -97,13 +97,13 @@ void ShowDump(const void *buffer, size_t length)
 		sprintf(hex+(i%16)*3, "%02X ", RBUFB(buffer,i));
 
 		if ((i%16) == 15) {
-			ShowDebug("%03"PRIXS" %s  %s\n", i/16, hex, ascii);
+			ShowDebug("%03zX %s  %s\n", i/16, hex, ascii);
 		}
 	}
 
 	if ((i%16) != 0) {
 		ascii[i%16] = 0;
-		ShowDebug("%03"PRIXS" %-48s  %-16s\n", i/16, hex, ascii);
+		ShowDebug("%03zX %-48s  %-16s\n", i/16, hex, ascii);
 	}
 }
 

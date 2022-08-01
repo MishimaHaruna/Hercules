@@ -8906,7 +8906,7 @@ static void clif_guild_message(struct guild *g, int account_id, const char *mes,
 		return;
 
 	if (len > sizeof(buf)-5) {
-		ShowWarning("clif_guild_message: Truncated message '%s' (len=%d, max=%"PRIuS", guild_id=%d).\n", mes, len, sizeof(buf)-5, g->guild_id);
+		ShowWarning("clif_guild_message: Truncated message '%s' (len=%d, max=%zu, guild_id=%d).\n", mes, len, sizeof(buf)-5, g->guild_id);
 		len = sizeof(buf)-5;
 	}
 
@@ -9204,7 +9204,7 @@ static void clif_disp_message(struct block_list *src, const char *mes, enum send
 		return;
 
 	if (len > (int)sizeof(buf)-5) {
-		ShowWarning("clif_disp_message: Truncated message '%s' (len=%d, max=%"PRIuS", aid=%d).\n", mes, len, sizeof(buf)-5, src->id);
+		ShowWarning("clif_disp_message: Truncated message '%s' (len=%d, max=%zu, aid=%d).\n", mes, len, sizeof(buf)-5, src->id);
 		len = (int)sizeof(buf)-5;
 	}
 
@@ -25517,7 +25517,7 @@ static int clif_parse(int fd)
 
 		// filter out invalid / unsupported packets
 		if (cmd > MAX_PACKET_DB || cmd < MIN_PACKET_DB || packets->db[cmd] == 0) {
-			ShowWarning("clif_parse: Received unsupported packet (packet 0x%04x (0x%04x), %"PRIuS" bytes received), disconnecting session #%d.\n",
+			ShowWarning("clif_parse: Received unsupported packet (packet 0x%04x (0x%04x), %zu bytes received), disconnecting session #%d.\n",
 			            (unsigned int)cmd, RFIFOW(fd,0), RFIFOREST(fd), fd);
 #ifdef DUMP_INVALID_PACKET
 			ShowDump(RFIFOP(fd,0), RFIFOREST(fd));

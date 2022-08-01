@@ -3319,7 +3319,7 @@ static void char_parse_frommap_save_character(int fd, int id)
 	struct online_char_data* character;
 
 	if (size - 13 != sizeof(struct mmo_charstatus)) {
-		ShowError("parse_from_map (save-char): Size mismatch! %d != %"PRIuS"\n", size-13, sizeof(struct mmo_charstatus));
+		ShowError("parse_from_map (save-char): Size mismatch! %d != %zu\n", size-13, sizeof(struct mmo_charstatus));
 		RFIFOSKIP(fd,size);
 		return;
 	}

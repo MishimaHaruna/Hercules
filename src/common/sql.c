@@ -777,7 +777,7 @@ static int SqlStmt_BindColumn(struct SqlStmt *self, size_t idx, enum SqlDataType
 
 	if (buffer_type == SQLDT_STRING || buffer_type == SQLDT_ENUM) {
 		if (buffer_len < 1) {
-			ShowDebug("SqlStmt_BindColumn: buffer_len(%"PRIuS") is too small, no room for the null-terminator\n", buffer_len);
+			ShowDebug("SqlStmt_BindColumn: buffer_len(%zu) is too small, no room for the null-terminator\n", buffer_len);
 			return SQL_ERROR;
 		}
 		--buffer_len;// null-terminator
